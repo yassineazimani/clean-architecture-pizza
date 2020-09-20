@@ -1,0 +1,5 @@
+rootProject.name = 'clean-architecture-pizza'
+include 'clean-architecture-pizza-core'
+include 'clean-architecture-pizza-adapters-primaries'
+include 'clean-architecture-pizza-adapters-secondaries'
+

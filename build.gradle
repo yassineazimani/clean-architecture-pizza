@@ -1,0 +1,14 @@
+group 'com.clean.architecture.pizza'
+version '1.0-SNAPSHOT'
+
+ext {
+    lombokVersion = '1.18.12'
+    assertJVersion = '3.17.2'
+    junitVersion = '4.13'
+    mockitoVersion = '3.5.11'
+    apacheCommonsLangVersion = '3.11'
+    apacheCommonsCollectionsVersion = '4.4'
+    springBootVersion = '2.3.4.RELEASE'
+    log4JVersion = '2.13.3'
+}
+

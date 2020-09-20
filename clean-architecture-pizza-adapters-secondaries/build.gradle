@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+}
+
+group 'com.clean.architecture.pizza.adapters.secondaries'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    hibernateVersion = '5.4.21.Final'
+    postgreSqlVersion = '42.2.16'
+    structMapVersion = '1.3.1.Final'
+}
+
+dependencies {
+    compile project(':clean-architecture-pizza-core')
+    compile group: 'org.hibernate', name: 'hibernate-core', version: "${hibernateVersion}"
+    compile group: 'org.postgresql', name: 'postgresql', version: "${postgreSqlVersion}"
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4JVersion}"
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4JVersion}"
+    implementation 'org.mapstruct:mapstruct:' + "${structMapVersion}"
+    annotationProcessor 'org.mapstruct:mapstruct-processor:' + "${structMapVersion}"
+    compileOnly 'org.projectlombok:lombok:' + "${lombokVersion}"
+    annotationProcessor 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testCompileOnly 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testAnnotationProcessor 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+}

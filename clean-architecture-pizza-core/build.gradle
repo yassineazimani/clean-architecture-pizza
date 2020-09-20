@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'com.clean.architecture.pizza.core'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: "${apacheCommonsCollectionsVersion}"
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: "${apacheCommonsLangVersion}"
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4JVersion}"
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4JVersion}"
+    compileOnly 'org.projectlombok:lombok:' + "${lombokVersion}"
+    annotationProcessor 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testCompileOnly 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testAnnotationProcessor 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+    testCompile group: 'org.assertj', name: 'assertj-core', version: "${assertJVersion}"
+    testCompile group: 'org.mockito', name: 'mockito-core', version: "${mockitoVersion}"
+}
