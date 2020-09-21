@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+}
+
+group 'com.clean.architecture.pizza'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':clean-architecture-pizza-core')
+    compile project(':clean-architecture-pizza-adapters-secondaries-hibernate')
+    compile project(':clean-architecture-pizza-adapters-secondaries-money-equipment')
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4JVersion}"
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4JVersion}"
+    implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    implementation 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+}

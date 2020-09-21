@@ -63,8 +63,6 @@ public class PersistProductUT {
 
     @Test
     public void save_product_should_success_when_user_is_logged_and_fields_are_given(){
-        Mockito.when(categoryRepository.findById(1))
-                .thenReturn(Optional.of(new CategoryDTO(1, "Pizzas")));
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
         ProductDTO pizza = ProductsStub.getPizza4Fromages(5);
         pizza.setId(null);
@@ -110,10 +108,6 @@ public class PersistProductUT {
     @Test
     public void update_product_should_success_when_user_is_logged_and_fields_are_given(){
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
-        Mockito.when(categoryRepository.findById(1))
-                .thenReturn(Optional.of(new CategoryDTO(1, "Pizzas")));
-        Mockito.when(productRepository.findById(1))
-                .thenReturn(Optional.of(ProductsStub.getPizza4Fromages(5)));
         Assertions.assertThatCode(() -> persistProduct.update(ProductsStub.getPizza4Fromages(5)))
                 .doesNotThrowAnyException();
     }// update_product_should_success_when_user_is_logged_and_fields_are_given()

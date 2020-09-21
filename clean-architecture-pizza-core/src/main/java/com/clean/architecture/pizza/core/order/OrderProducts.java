@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -56,18 +57,34 @@ public class OrderProducts {
      * @param product Produit
      * @throws ArgumentMissingException Exception se produisant si le produit est null
      */
-    public void addProduct(ProductDTO product) throws ArgumentMissingException, OrderException, DatabaseException {
+    public void addProduct(ProductDTO product, int quantity) throws ArgumentMissingException, OrderException, DatabaseException {
         if(product == null){
             throw new ArgumentMissingException("Product argument is null");
         }
-        this.eCommerceCart.add(product);
+        checkQuantityAvailableForProductOrdered(product.getId(), quantity);
+        double totalPriceOrdered = product.getPrice() * quantity;
+        for(int i = 0; i < quantity; ++i){
+            this.eCommerceCart.add(product);
+        }
         if(currentOrder.getId() == null){
-            currentOrder.setTotal(currentOrder.getTotal() + product.getPrice());
+            currentOrder.setTotal(currentOrder.getTotal() + totalPriceOrdered);
             currentOrder = orderRepository.save(currentOrder);
         }else{
-            this.updateTotalOrder(currentOrder.getId(), product.getPrice());
+            this.updateTotalOrder(currentOrder.getId(), totalPriceOrdered);
         }
     }// addProduct()
+
+    private void checkQuantityAvailableForProductOrdered(int productId, int quantity) throws OrderException{
+        Optional<ProductDTO> optProduct = this.productRepository.findById(productId);
+        if(optProduct.isPresent()){
+            ProductDTO p = optProduct.get();
+            if(p.getQuantityAvailable() < quantity){
+                throw new OrderException("The quantity asked is greater than the quantity available");
+            }
+        }else{
+            LOGGER.error("Impossible to check quantity available for product with id = " + productId);
+        }
+    }// checkQuantityAvailableForProductsOrdered()
 
     public void removeProduct(int id) throws OrderException {
         boolean result = this.eCommerceCart.removeIf(product -> product.getId().equals(id));

@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+group 'com.clean.architecture.pizza.adapters.secondaries.money.equipment'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':clean-architecture-pizza-core')
+}

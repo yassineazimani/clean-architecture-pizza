@@ -99,8 +99,6 @@ public class PersistCategoryUT {
     @Test
     public void update_category_should_success_when_user_is_logged_and_fields_are_given(){
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
-        Mockito.when(categoryRepository.findById(1))
-                .thenReturn(Optional.of(new CategoryDTO(1, "Pizzas")));
         Assertions.assertThatCode(() -> persistCategory.update(new CategoryDTO(1, "Pizzas")))
                 .doesNotThrowAnyException();
     }// update_category_should_success_when_user_is_logged_and_fields_are_given()

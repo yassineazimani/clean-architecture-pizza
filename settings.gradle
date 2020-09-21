@@ -1,5 +1,7 @@
 rootProject.name = 'clean-architecture-pizza'
 include 'clean-architecture-pizza-core'
-include 'clean-architecture-pizza-adapters-primaries'
-include 'clean-architecture-pizza-adapters-secondaries'
+include 'clean-architecture-pizza-adapters-secondaries-hibernate'
+include 'clean-architecture-pizza-adapters-primaries-cli'
+include 'clean-architecture-pizza-adapters-primaires-rest-spring-boot'
+include 'clean-architecture-pizza-adapters-secondaries-money-equipment'
 

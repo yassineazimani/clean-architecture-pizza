@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'com.clean.architecture.pizza.adapters.primaries.cli'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':clean-architecture-pizza-core')
+    compile project(':clean-architecture-pizza-adapters-secondaries-hibernate')
+    compile project (':clean-architecture-pizza-adapters-secondaries-money-equipment')
+    testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+}

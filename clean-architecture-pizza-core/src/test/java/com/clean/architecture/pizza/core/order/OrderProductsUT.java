@@ -53,15 +53,27 @@ public class OrderProductsUT {
 
     @Test
     public void add_product_in_ecommerce_cart_without_product_should_throw_argument_missing_exception(){
-        Assertions.assertThatCode(() -> orderProducts.addProduct(null))
+        Assertions.assertThatCode(() -> orderProducts.addProduct(null, 0))
                 .hasMessage("Product argument is null")
                 .isInstanceOf(ArgumentMissingException.class);
     }// add_product_in_ecommerce_cart_without_product_should_throw_argument_missing_exception()
 
+
+    @Test
+    public void add_product_should_throw_order_exception_when_quantity_asked_gt_quantity_available(){
+        ProductDTO pizzaFromDB = ProductsStub.getPizza4Fromages(1);
+        ProductDTO pizzaWanted = ProductsStub.getPizza4Fromages(2);
+        Mockito.when(this.productRepository.findById(pizzaWanted.getId()))
+                .thenReturn(Optional.of(pizzaFromDB));
+        Assertions.assertThatCode(() -> orderProducts.addProduct(pizzaWanted, 2))
+                .hasMessage("The quantity asked is greater than the quantity available")
+                .isInstanceOf(OrderException.class);
+    }// add_product_should_throw_order_exception_when_quantity_asked_gt_quantity_available()
+
     @Test
     public void add_product_in_ecommerce_cart_with_product_should_success(){
         ProductDTO pizza = ProductsStub.getPizza4Fromages(3);
-        Assertions.assertThatCode(() -> orderProducts.addProduct(pizza))
+        Assertions.assertThatCode(() -> orderProducts.addProduct(pizza, 1))
                 .doesNotThrowAnyException();
         List<ProductDTO> eCommerceCart = orderProducts.getECommerceCart();
         Assertions.assertThat(eCommerceCart).isNotEmpty();
@@ -89,9 +101,8 @@ public class OrderProductsUT {
         OrderDTO order = OrdersStub.getSingleProductOrder(true, OrderStateEnum.PENDING);
         Mockito.when(orderRepository.save(Mockito.any(OrderDTO.class))).thenReturn(order);
         Mockito.when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-        orderProducts.addProduct(pizza);
-        orderProducts.addProduct(pizza);
-        orderProducts.addProduct(orangina);
+        orderProducts.addProduct(pizza, 2);
+        orderProducts.addProduct(orangina, 1);
         double total = orderProducts.getTotal();
         Assertions.assertThat(total).isEqualTo(20.7);
     }// get_total_should_return_20_7_when_2_pizza_4_fromages_and_orangina_are_ordered()
@@ -99,7 +110,7 @@ public class OrderProductsUT {
     @Test
     public void remove_product_from_ecommerce_cart_with_id_product_to_remove_should_success(){
         ProductDTO pizza = ProductsStub.getPizza4Fromages(3);
-        Assertions.assertThatCode(() -> orderProducts.addProduct(pizza))
+        Assertions.assertThatCode(() -> orderProducts.addProduct(pizza, 1))
                 .doesNotThrowAnyException();
         Assertions.assertThatCode(() -> orderProducts.removeProduct(1))
                 .doesNotThrowAnyException();
@@ -117,15 +128,10 @@ public class OrderProductsUT {
     @Test
     public void clear_ecommerce_cart_should_clear_ecommerce_cart_when_it_s_not_empty() throws ArgumentMissingException, OrderException, DatabaseException {
         ProductDTO pizza = ProductsStub.getPizza4Fromages(3);
-        orderProducts.addProduct(pizza);
+        orderProducts.addProduct(pizza, 1);
         orderProducts.clearECommerceCart();
         Assertions.assertThat(orderProducts.getECommerceCart()).isEmpty();
     }// clear_ecommerce_cart_should_clear_ecommerce_cart_when_it_s_not_empty()
-
-    @Test
-    public void payment_order_with_cb_should_success(){
-
-    }// payment_order_with_cb_should_success()
 
     @Test
     public void payment_order_should_throw_order_exception_when_ecommerce_cart_is_empty(){
@@ -137,7 +143,7 @@ public class OrderProductsUT {
     @Test
     public void payment_order_should_throw_order_exception_when_no_mean_payment_given() throws ArgumentMissingException, OrderException, DatabaseException {
         ProductDTO pizza = ProductsStub.getPizza4Fromages(3);
-        orderProducts.addProduct(pizza);
+        orderProducts.addProduct(pizza, 1);
         Assertions.assertThatCode(() -> orderProducts.paymentOrder(null))
                 .hasMessage("MoneyEnum is null")
                 .isInstanceOf(OrderException.class);
@@ -154,7 +160,7 @@ public class OrderProductsUT {
                 .thenReturn(Optional.of(order));
         Mockito.when(productRepository.findById(pizza.getId()))
                 .thenReturn(Optional.of(pizza));
-        orderProducts.addProduct(pizza);
+        orderProducts.addProduct(pizza, 1);
         Assertions.assertThatCode(() -> orderProducts.paymentOrder(MoneyEnum.COINS))
                 .doesNotThrowAnyException();
         Optional<ProductDTO> optPizzaFromBD = productRepository.findById(pizza.getId());
@@ -170,7 +176,7 @@ public class OrderProductsUT {
                 .thenReturn(Optional.of(order));
         Mockito.when(orderRepository.save(Mockito.any(OrderDTO.class)))
                 .thenReturn(order);
-        orderProducts.addProduct(pizza);
+        orderProducts.addProduct(pizza, 1);
         Assertions.assertThatCode(() -> orderProducts.paymentOrder(MoneyEnum.CB))
                 .hasMessage("Impossible to finalize order for CB payment")
                 .isInstanceOf(OrderException.class);
@@ -187,7 +193,7 @@ public class OrderProductsUT {
                 .thenReturn(Optional.of(order));
         Mockito.when(productRepository.findById(pizza.getId()))
                 .thenReturn(Optional.of(pizza));
-        orderProducts.addProduct(pizza);
+        orderProducts.addProduct(pizza, 1);
         Assertions.assertThatCode(() -> orderProducts.paymentOrder(MoneyEnum.CB, TRANSACTION_CB_ID))
                 .doesNotThrowAnyException();
         Optional<ProductDTO> optPizzaFromBD = productRepository.findById(pizza.getId());

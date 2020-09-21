@@ -40,6 +40,7 @@ CREATE TABLE ordercmd(
 CREATE TABLE order_has_products(
     orderId INTEGER NOT NULL,
     productId INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
     CONSTRAINT FK_order FOREIGN KEY (orderId) REFERENCES ordercmd,
     CONSTRAINT FK_product FOREIGN KEY (productId) REFERENCES product,
     CONSTRAINT PK_order_has_products PRIMARY KEY (orderId, productId)
