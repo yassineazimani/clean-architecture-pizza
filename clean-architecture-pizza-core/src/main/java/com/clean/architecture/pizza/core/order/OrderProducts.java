@@ -2,10 +2,7 @@ package com.clean.architecture.pizza.core.order;
 
 import com.clean.architecture.pizza.core.enums.MoneyEnum;
 import com.clean.architecture.pizza.core.enums.OrderStateEnum;
-import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
-import com.clean.architecture.pizza.core.exceptions.CoinsInfrastructureException;
-import com.clean.architecture.pizza.core.exceptions.DatabaseException;
-import com.clean.architecture.pizza.core.exceptions.OrderException;
+import com.clean.architecture.pizza.core.exceptions.*;
 import com.clean.architecture.pizza.core.model.OrderDTO;
 import com.clean.architecture.pizza.core.model.ProductDTO;
 import com.clean.architecture.pizza.core.ports.CoinsInfrastructure;
@@ -17,10 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +24,7 @@ import java.util.stream.Collectors;
 public class OrderProducts {
 
     @Getter
-    private final List<ProductDTO> eCommerceCart;
+    private Set<ProductDTO> eCommerceCart;
 
     private OrderDTO currentOrder;
 
@@ -45,7 +39,7 @@ public class OrderProducts {
     public OrderProducts(OrderRepository orderRepository,
                          ProductRepository productRepository,
                          CoinsInfrastructure coinsInfrastructure) {
-        this.eCommerceCart = new ArrayList<>();
+        this.eCommerceCart = new HashSet<>();
         this.currentOrder = new OrderDTO();
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
@@ -57,20 +51,36 @@ public class OrderProducts {
      * @param product Produit
      * @throws ArgumentMissingException Exception se produisant si le produit est null
      */
-    public void addProduct(ProductDTO product, int quantity) throws ArgumentMissingException, OrderException, DatabaseException {
+    public void addProduct(ProductDTO product) throws ArgumentMissingException, OrderException, DatabaseException {
         if(product == null){
             throw new ArgumentMissingException("Product argument is null");
         }
-        checkQuantityAvailableForProductOrdered(product.getId(), quantity);
-        double totalPriceOrdered = product.getPrice() * quantity;
-        for(int i = 0; i < quantity; ++i){
-            this.eCommerceCart.add(product);
-        }
-        if(currentOrder.getId() == null){
+        try {
+            this.orderRepository.begin();
+            checkQuantityAvailableForProductOrdered(product.getId(), product.getQuantityOrdered());
+            double totalPriceOrdered = product.getPrice() * product.getQuantityOrdered();
+            if (!this.eCommerceCart.contains(product)) {
+                this.eCommerceCart.add(product);
+            } else {
+                this.eCommerceCart = this.eCommerceCart.stream().peek(
+                        p -> {
+                            if (p.getId().equals(product.getId())) {
+                                p.setQuantityOrdered(p.getQuantityOrdered() + product.getQuantityOrdered());
+                            }
+                        }
+                ).collect(Collectors.toSet());
+            }
             currentOrder.setTotal(currentOrder.getTotal() + totalPriceOrdered);
-            currentOrder = orderRepository.save(currentOrder);
-        }else{
-            this.updateTotalOrder(currentOrder.getId(), totalPriceOrdered);
+            currentOrder.setProducts(new ArrayList<>(this.eCommerceCart));
+            if (currentOrder.getId() == null) {
+                currentOrder = orderRepository.save(currentOrder);
+            } else {
+                orderRepository.update(currentOrder);
+            }
+            this.orderRepository.commit();
+        }catch(TransactionException te){
+            this.orderRepository.rollback();
+            throw new OrderException("Technical error : Impossible to order");
         }
     }// addProduct()
 
@@ -87,29 +97,43 @@ public class OrderProducts {
     }// checkQuantityAvailableForProductsOrdered()
 
     public void removeProduct(int id) throws OrderException {
-        boolean result = this.eCommerceCart.removeIf(product -> product.getId().equals(id));
-        if(!result){
-            throw new OrderException("Product with id " + id + " doesn't exist");
+        try {
+            this.orderRepository.begin();
+            boolean result = this.eCommerceCart.removeIf(product -> product.getId().equals(id));
+            if (!result) {
+                throw new OrderException("Product with id " + id + " doesn't exist");
+            }
+            this.orderRepository.commit();
+        }catch(TransactionException te){
+            this.orderRepository.rollback();
+            throw new OrderException("Technical error : Impossible to remove product from order");
         }
     }// removeProduct()
 
     public void cancelOrder() throws OrderException, DatabaseException, ArgumentMissingException {
-        if(currentOrder.getId() == null){
+        try {
+            this.orderRepository.begin();
             currentOrder.setOrderState(OrderStateEnum.CANCELLED);
-            orderRepository.save(currentOrder);
-        }else{
-            this.updateStateOrder(currentOrder.getId(), OrderStateEnum.CANCELLED);
+            if(currentOrder.getId() == null){
+                orderRepository.save(currentOrder);
+            }else{
+                orderRepository.update(currentOrder);
+            }
+            this.eCommerceCart.clear();
+            this.currentOrder = new OrderDTO();
+            this.orderRepository.commit();
+        }catch(TransactionException te){
+            this.orderRepository.rollback();
+            throw new OrderException("Technical error : Impossible to cancel order");
         }
-        this.eCommerceCart.clear();
-        this.currentOrder = new OrderDTO();
     }// cancelOrder()
 
     public double getTotal(){
         double total = 0.;
         if(!CollectionUtils.isEmpty(this.eCommerceCart)){
             total = this.eCommerceCart.stream()
-                    .map(product -> product.getPrice())
-                    .reduce(0., (p1, p2) -> p1 + p2);
+                    .map(product -> product.getPrice() * product.getQuantityOrdered())
+                    .reduce(0., Double::sum);
         }
         return total;
     }// getTotal()
@@ -124,13 +148,14 @@ public class OrderProducts {
      * @throws OrderException
      */
     public void reduceQuantityAvailable() throws OrderException{
-        if(CollectionUtils.isEmpty(this.eCommerceCart)){
-            throw new OrderException("Impossible to update quantity available for products");
-        }
-        Map<Integer, List<ProductDTO>> productsById = this.eCommerceCart.stream()
-                .collect(Collectors.groupingBy(ProductDTO::getId));
-        productsById.forEach((productId, products) -> {
-            productRepository.findById(productId)
+        try {
+            productRepository.begin();
+            if (CollectionUtils.isEmpty(this.eCommerceCart)) {
+                throw new OrderException("Impossible to update quantity available for products");
+            }
+            Map<Integer, List<ProductDTO>> productsById = this.eCommerceCart.stream()
+                    .collect(Collectors.groupingBy(ProductDTO::getId));
+            productsById.forEach((productId, products) -> productRepository.findById(productId)
                     .ifPresent(product -> {
                         product.setQuantityAvailable(product.getQuantityAvailable() - products.size());
                         try {
@@ -138,8 +163,11 @@ public class OrderProducts {
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }
-                    });
-        });
+                    }));
+            productRepository.commit();
+        }catch(TransactionException te){
+            productRepository.rollback();
+        }
     }// reduceQuantityAvailable()
 
     public void paymentOrder(MoneyEnum moneyEnum) throws OrderException, DatabaseException, ArgumentMissingException {
@@ -160,31 +188,24 @@ public class OrderProducts {
                 LOGGER.error(cie.getMessage(), cie);
             }
         }
-        this.finalizeOrder(currentOrder.getId(), moneyEnum, transactionCBId);
-        this.clearECommerceCart();
-        this.currentOrder = new OrderDTO();
+        try {
+            this.orderRepository.begin();
+            this.finalizeOrder(currentOrder.getId(), moneyEnum, transactionCBId);
+            this.clearECommerceCart();
+            this.currentOrder = new OrderDTO();
+            this.orderRepository.commit();
+        }catch(TransactionException te){
+            this.orderRepository.rollback();
+            throw new OrderException("Impossible to reduce quantity available");
+        }
     }// paymentOrder
-
-    private void updateTotalOrder(int orderId, double price) throws OrderException, DatabaseException, ArgumentMissingException {
-        OrderDTO order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderException("Impossible to update order because it's impossible to find order with id " + orderId));
-        order.setTotal(order.getTotal() + price);
-        orderRepository.update(order);
-    }// updateTotalOrder()
-
-    private void updateStateOrder(int orderId, OrderStateEnum state) throws OrderException, DatabaseException, ArgumentMissingException {
-        OrderDTO order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderException("Impossible to update order because it's impossible to find order with id " + orderId));
-        order.setOrderState(state);
-        orderRepository.update(order);
-    }// updateStateOrder()
 
     private void finalizeOrder(int orderId, MoneyEnum moneyEnum, String transactionCBId) throws OrderException, DatabaseException, ArgumentMissingException {
         OrderDTO order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException("Impossible to finalize order because it's impossible to find order with id " + orderId));
         order.setOrderState(OrderStateEnum.SUCCESS);
-        order.setProducts(this.eCommerceCart);
-        if(moneyEnum != null && moneyEnum == MoneyEnum.CB){
+        order.setProducts(new ArrayList<>(this.eCommerceCart));
+        if(moneyEnum == MoneyEnum.CB){
             if(StringUtils.isEmpty(transactionCBId)){
                 throw new OrderException("Impossible to finalize order for CB payment");
             }

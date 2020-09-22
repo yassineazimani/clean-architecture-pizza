@@ -12,6 +12,7 @@ public interface OrderMapper {
     OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
 
     @Mapping(ignore = true, target = "orderState")
+    @Mapping(ignore = true, target = "products")
     OrderDTO toDto(Order order);
 
     @Mapping(ignore = true, target = "orderState")

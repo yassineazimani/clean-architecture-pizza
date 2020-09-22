@@ -1,14 +1,12 @@
 package com.clean.architecture.pizza.core.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = {"id"})
 public class ProductDTO {
 
     private Integer id;
@@ -22,5 +20,7 @@ public class ProductDTO {
     private int quantityAvailable;
 
     private CategoryDTO category;
+
+    private int quantityOrdered;
 
 }// ProductDTO

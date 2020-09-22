@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Gestion du stockage des produits
  */
-public interface ProductRepository {
+public interface ProductRepository extends ManagementTransaction{
 
     /**
      * Récupération de tous les produits

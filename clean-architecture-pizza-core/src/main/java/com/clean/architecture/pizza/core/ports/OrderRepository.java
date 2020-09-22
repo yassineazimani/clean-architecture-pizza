@@ -6,7 +6,7 @@ import com.clean.architecture.pizza.core.model.OrderDTO;
 
 import java.util.Optional;
 
-public interface OrderRepository {
+public interface OrderRepository extends ManagementTransaction{
 
     Optional<OrderDTO> findById(int id);
 

@@ -6,7 +6,7 @@ import com.clean.architecture.pizza.core.model.CategoryDTO;
 
 import java.util.Optional;
 
-public interface CategoryRepository {
+public interface CategoryRepository extends ManagementTransaction{
 
     /**
      * Vérifie l'existence d'une catégorie

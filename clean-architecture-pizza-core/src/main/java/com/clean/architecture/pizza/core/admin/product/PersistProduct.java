@@ -4,7 +4,6 @@ import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
 import com.clean.architecture.pizza.core.exceptions.AuthenticationException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.exceptions.ProductException;
-import com.clean.architecture.pizza.core.model.CategoryDTO;
 import com.clean.architecture.pizza.core.model.ProductDTO;
 import com.clean.architecture.pizza.core.ports.AuthenticationUser;
 import com.clean.architecture.pizza.core.ports.CategoryRepository;

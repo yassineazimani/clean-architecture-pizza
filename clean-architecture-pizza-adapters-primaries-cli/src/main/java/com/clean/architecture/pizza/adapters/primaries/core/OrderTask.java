@@ -39,7 +39,14 @@ public class OrderTask {
             int productId = this.choiceProduct();
             int quantity = this.choiceQuantity(productId);
             try {
-                orderProducts.addProduct(products.stream().filter(p -> p.getId().equals(productId)).findAny().get(), quantity);
+                Optional<ProductDTO> optProductOrdered = products.stream()
+                        .filter(p -> p.getId().equals(productId))
+                        .findAny();
+                if(optProductOrdered.isPresent()){
+                    ProductDTO productOrdered = optProductOrdered.get();
+                    productOrdered.setQuantityOrdered(quantity);
+                    orderProducts.addProduct(productOrdered);
+                }
             } catch (OrderException orderException){
                 System.err.println(orderException.getMessage());
             } catch (DatabaseException | ArgumentMissingException e){
@@ -68,7 +75,7 @@ public class OrderTask {
 
     private Integer choiceProduct(){
         boolean keep = true;
-        Integer result = 1;
+        int result = 1;
         Scanner scan = new Scanner(System.in);
         while(keep) {
             try {
@@ -90,7 +97,7 @@ public class OrderTask {
 
     private Integer choiceQuantity(int productIdSelected){
         boolean keep = true;
-        Integer result = 1;
+        int result = 1;
         Optional<ProductDTO> optProduct = fetchProducts.findById(productIdSelected);
         Scanner scan = new Scanner(System.in);
         while(keep) {

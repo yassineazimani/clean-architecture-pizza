@@ -1,13 +1,11 @@
 package clean.architecture.pizza.adapters.secondaries.hibernate.config;
 
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
+import com.clean.architecture.pizza.core.exceptions.TransactionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.RollbackException;
+import javax.persistence.*;
 import java.util.Map;
 
 public abstract class AbstractRepository<T> {
@@ -27,10 +25,8 @@ public abstract class AbstractRepository<T> {
     public void save(T entity) throws DatabaseException {
         if(entity != null){
             try {
-                this.entityManager.getTransaction().begin();
                 this.entityManager.persist(entity);
                 this.entityManager.flush();
-                this.entityManager.getTransaction().commit();
             }catch(RollbackException re){
                 LOGGER.error(re.getMessage(), re);
                 throw new DatabaseException("Impossible to save entity");
@@ -41,15 +37,44 @@ public abstract class AbstractRepository<T> {
     public void update(T entity) throws DatabaseException {
         if(entity != null){
             try {
-                this.entityManager.getTransaction().begin();
                 this.entityManager.merge(entity);
                 this.entityManager.flush();
-                this.entityManager.getTransaction().commit();
             }catch(RollbackException re){
                 LOGGER.error(re.getMessage(), re);
                 throw new DatabaseException("Impossible to update entity");
             }
         }
     }// update()
+
+    /**
+     * Commence une nouvelle transaction.
+     */
+    public void begin(){
+        if(!this.entityManager.getTransaction().isActive())
+            this.entityManager.getTransaction().begin();
+    }// begin()
+
+    /**
+     * Commit la transaction.
+     * @throws IllegalStateException
+     * @throws TransactionException Si le commit échoue
+     */
+    public void commit() throws TransactionException{
+        try {
+            this.entityManager.getTransaction().commit();
+        }catch(RollbackException re){
+            LOGGER.error(re.getMessage(), re);
+            throw new TransactionException(re.getMessage());
+        }
+    }// commit()
+
+    /**
+     * Annule la dernière transaction.
+     * @throws IllegalStateException
+     * @throws DatabaseException si erreur au niveau de la base de données
+     */
+    public void rollback(){
+        this.entityManager.getTransaction().rollback();
+    }// rollback()
 
 }// AbstractRepository

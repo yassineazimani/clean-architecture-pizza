@@ -7,8 +7,6 @@ public enum OrderStateEnum {
 
     public static OrderStateEnum valueOf(int id){
         switch(id){
-            case 1:
-                return OrderStateEnum.PENDING;
             case 2:
                 return OrderStateEnum.SUCCESS;
             case 3:

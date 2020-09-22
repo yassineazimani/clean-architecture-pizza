@@ -2,6 +2,7 @@ package clean.architecture.pizza.adapters.secondaries.hibernate.entities;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,20 +11,17 @@ import javax.persistence.*;
 @Setter
 @Entity
 @EqualsAndHashCode
+@NoArgsConstructor
 @Table(name = "order_has_products")
 public class OrderHasProducts {
 
     @EmbeddedId
-    private OrderHasProductsId id = new OrderHasProductsId();
-
-    @ManyToOne
-    @MapsId("orderId")
-    private Order order;
-
-    @ManyToOne
-    @MapsId("productId")
-    private Product product;
+    private OrderHasProductsId id;
 
     private Integer quantity;
+
+    public OrderHasProducts(OrderHasProductsId id) {
+        this.id = id;
+    }// OrderHasProducts()
 
 }// OrderHasProducts
