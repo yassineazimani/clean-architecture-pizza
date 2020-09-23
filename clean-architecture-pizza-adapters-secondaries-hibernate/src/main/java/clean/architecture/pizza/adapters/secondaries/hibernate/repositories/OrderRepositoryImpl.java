@@ -9,6 +9,7 @@ import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.model.OrderDTO;
 import com.clean.architecture.pizza.core.ports.OrderRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public class OrderRepositoryImpl extends AbstractRepository<Order> implements OrderRepository {
@@ -60,12 +61,17 @@ public class OrderRepositoryImpl extends AbstractRepository<Order> implements Or
         OrderState state = this.entityManager.find(OrderState.class, order.getOrderState().ordinal() + 1);
         o.setOrderState(state);
         super.update(o);
+        List<OrderHasProducts> listOrderHasProducts = this.entityManager.createQuery("SELECT ohp FROM OrderHasProducts ohp WHERE ohp.id.orderid = :orderid")
+                .setParameter("orderid", order.getId())
+                .getResultList();
+        listOrderHasProducts.forEach(ohp -> super.entityManager.remove(ohp));
         order.getProducts()
                 .stream()
                 .forEach(product -> {
                     OrderHasProducts ohp = new OrderHasProducts(new OrderHasProductsId(order.getId(), product.getId()));
                     ohp.setQuantity(product.getQuantityOrdered());
-                    super.entityManager.merge(ohp);
+                    super.entityManager.persist(ohp);
+                    //super.entityManager.flush();
                 });
         return order;
     }// update()
