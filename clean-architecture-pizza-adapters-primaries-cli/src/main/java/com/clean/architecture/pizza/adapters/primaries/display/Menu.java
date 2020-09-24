@@ -36,4 +36,38 @@ public class Menu {
         return allProducts;
     }// displayMenu()
 
+    public void displayAdminMenu(){
+        System.out.println("########################### MENU ########################");
+        System.out.println();
+        System.out.println("1. Manage categories");
+        System.out.println("2. Manage products");
+        System.out.println("3. Statistics consultation");
+        System.out.println("4. Quit");
+    }// displayAdminMenu()
+
+    public void displayAdminMenuCategory(){
+        System.out.println("########################### MANAGE CATEGORIES ########################");
+        System.out.println();
+        System.out.println("1. Create a category");
+        System.out.println("2. Update a category");
+        System.out.println("3. Delete a product");
+        System.out.println("4. Display all categories");
+        System.out.println("5. Back to main menu");
+    }// displayAdminMenuCategory()
+
+    public void displayAdminMenuProduct(){
+        System.out.println("########################### MANAGE PRODUCTS ########################");
+        System.out.println();
+        System.out.println("1. Create a product");
+        System.out.println("2. Update a product");
+        System.out.println("3. Delete a product");
+        System.out.println("4. Display all products");
+        System.out.println("5. Back to main menu");
+    }// displayAdminMenuProduct()
+
+    public void displayAdminMenuStats(){
+        System.out.println("########################### STATISTICS ########################");
+        System.out.println();
+    }// displayAdminMenuStats()
+
 }// Menu

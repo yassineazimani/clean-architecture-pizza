@@ -10,5 +10,6 @@ ext {
     apacheCommonsCollectionsVersion = '4.4'
     springBootVersion = '2.3.4.RELEASE'
     log4JVersion = '2.13.3'
+    bcryptVersion = '0.9.0'
 }
 

@@ -1,9 +1,6 @@
 package com.clean.architecture.pizza.core.admin.category;
 
-import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
-import com.clean.architecture.pizza.core.exceptions.AuthenticationException;
-import com.clean.architecture.pizza.core.exceptions.CategoryException;
-import com.clean.architecture.pizza.core.exceptions.DatabaseException;
+import com.clean.architecture.pizza.core.exceptions.*;
 import com.clean.architecture.pizza.core.model.CategoryDTO;
 import com.clean.architecture.pizza.core.ports.AuthenticationUser;
 import com.clean.architecture.pizza.core.ports.CategoryRepository;
@@ -30,7 +27,14 @@ public class PersistCategory {
             throw new AuthenticationException("You need to login");
         }
         checkBusiness(category, false);
-        this.categoryRepository.save(category);
+        try{
+            this.categoryRepository.begin();
+            this.categoryRepository.save(category);
+            this.categoryRepository.commit();
+        }catch (TransactionException te){
+            this.categoryRepository.rollback();
+            throw new CategoryException("Error technical : Impossible to create a category");
+        }
     }// save()
 
     public void update(CategoryDTO category) throws ArgumentMissingException, CategoryException, AuthenticationException, DatabaseException {
@@ -38,7 +42,14 @@ public class PersistCategory {
             throw new AuthenticationException("You need to login");
         }
         checkBusiness(category, true);
-        this.categoryRepository.update(category);
+        try{
+            this.categoryRepository.begin();
+            this.categoryRepository.update(category);
+            this.categoryRepository.commit();
+        }catch (TransactionException te){
+            this.categoryRepository.rollback();
+            throw new CategoryException("Error technical : Impossible to update a category");
+        }
     }// update()
 
     private void checkBusiness(CategoryDTO category, boolean isUpdate) throws CategoryException, ArgumentMissingException {

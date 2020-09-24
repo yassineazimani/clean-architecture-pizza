@@ -1,7 +1,9 @@
 package com.clean.architecture.pizza.core.admin.category;
 
 import com.clean.architecture.pizza.core.exceptions.AuthenticationException;
+import com.clean.architecture.pizza.core.exceptions.CategoryException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
+import com.clean.architecture.pizza.core.exceptions.TransactionException;
 import com.clean.architecture.pizza.core.ports.AuthenticationUser;
 import com.clean.architecture.pizza.core.ports.CategoryRepository;
 
@@ -17,15 +19,20 @@ public class RemoveCategory {
         this.authenticationUser = authenticationUser;
     }// RemoveCategory()
 
-    public boolean execute(int id) throws AuthenticationException, DatabaseException {
+    public void execute(int id) throws AuthenticationException, DatabaseException, CategoryException {
         if(!authenticationUser.isAuthenticated()){
             throw new AuthenticationException("You need to login");
         }
-        if(this.categoryRepository.existsById(id)){
-            this.categoryRepository.deleteById(id);
-            return true;
+        try{
+            this.categoryRepository.begin();
+            if(this.categoryRepository.existsById(id)){
+                this.categoryRepository.deleteById(id);
+            }
+            this.categoryRepository.commit();
+        }catch (TransactionException te){
+            this.categoryRepository.rollback();
+            throw new CategoryException("Error technical : Impossible to create a category");
         }
-        return false;
     }// execute()
 
 }// RemoveCategory

@@ -5,7 +5,7 @@ import com.clean.architecture.pizza.adapters.primaries.core.AppTask;
 public class Application {
 
     public static void main(String[] args) {
-        AppTask.run();
+        AppTask.run(args);
     }// main()
 
 }// Application

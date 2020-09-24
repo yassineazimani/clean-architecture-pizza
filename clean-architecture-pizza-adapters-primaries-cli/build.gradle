@@ -12,8 +12,13 @@ repositories {
 }
 
 dependencies {
+    compile group: 'at.favre.lib', name: 'bcrypt', version: "${bcryptVersion}"
     compile project(':clean-architecture-pizza-core')
     compile project(':clean-architecture-pizza-adapters-secondaries-hibernate')
     compile project (':clean-architecture-pizza-adapters-secondaries-money-equipment')
+    compileOnly 'org.projectlombok:lombok:' + "${lombokVersion}"
+    annotationProcessor 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testCompileOnly 'org.projectlombok:lombok:' + "${lombokVersion}"
+    testAnnotationProcessor 'org.projectlombok:lombok:' + "${lombokVersion}"
     testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
 }

@@ -4,6 +4,7 @@ import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.model.CategoryDTO;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepository extends ManagementTransaction{
@@ -39,5 +40,11 @@ public interface CategoryRepository extends ManagementTransaction{
      * @param category Catégorie
      */
     void update(CategoryDTO category) throws DatabaseException, ArgumentMissingException;
+
+    /**
+     * Récupération de toutes les catégories
+     * @return List de catégories {@see CategoryDTO}
+     */
+    List<CategoryDTO> findAll();
 
 }// CategoryRepository

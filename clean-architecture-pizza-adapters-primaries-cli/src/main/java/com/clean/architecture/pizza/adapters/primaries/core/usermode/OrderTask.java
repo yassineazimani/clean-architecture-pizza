@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.core;
+package com.clean.architecture.pizza.adapters.primaries.core.usermode;
 
 import com.clean.architecture.pizza.adapters.primaries.display.Menu;
 import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
@@ -79,7 +79,7 @@ public class OrderTask {
         Scanner scan = new Scanner(System.in);
         while(keep) {
             try {
-                System.out.println("What is your choice (Give number) ? ");
+                System.out.print("What is your choice (Give number) ? ");
                 System.out.println();
                 result = scan.nextInt();
                 if(fetchProducts.existsById(result)) {
@@ -101,7 +101,7 @@ public class OrderTask {
         Optional<ProductDTO> optProduct = fetchProducts.findById(productIdSelected);
         Scanner scan = new Scanner(System.in);
         while(keep) {
-            System.out.println("How many ?");
+            System.out.print("How many ?");
             try {
                 result = scan.nextInt();
                 if(result == 0){

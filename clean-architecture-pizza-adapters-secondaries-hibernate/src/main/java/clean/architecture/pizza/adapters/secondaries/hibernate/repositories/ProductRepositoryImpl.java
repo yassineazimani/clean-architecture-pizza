@@ -29,8 +29,10 @@ public class ProductRepositoryImpl extends AbstractRepository<Product>
                         .createQuery("SELECT p FROM Product p JOIN p.category c", Product.class)
                         .getResultList();
         return products.stream()
-                .map(product -> ProductMapper.INSTANCE.toDto(product))
-                .collect(Collectors.toList());
+                .map(product -> {
+                    this.entityManager.refresh(product);
+                    return ProductMapper.INSTANCE.toDto(product);
+                }).collect(Collectors.toList());
     }// findAllProducts()
 
     @Override
@@ -39,6 +41,7 @@ public class ProductRepositoryImpl extends AbstractRepository<Product>
         if(product == null){
             return Optional.empty();
         }
+        this.entityManager.refresh(product);
         return Optional.of(ProductMapper.INSTANCE.toDto(product));
     }// findById()
 

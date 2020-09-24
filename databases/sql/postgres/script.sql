@@ -52,7 +52,7 @@ CREATE TABLE admin(
     CONSTRAINT PK_admin PRIMARY KEY(id)
 );
 
-INSERT INTO admin (id, password) VALUES (109856, '');
+INSERT INTO admin (id, password) VALUES (109856, '$2a$12$boWhkrsHVdNZhQIgQCq/sum1IV.Wp1SIb9rJMxsAue6TkT5Fge9je');
 
 INSERT INTO category(name) VALUES ('pizzas');
 INSERT INTO category(name) VALUES ('drinks');

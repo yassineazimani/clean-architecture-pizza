@@ -20,6 +20,7 @@ public class OrderRepositoryImpl extends AbstractRepository<Order> implements Or
         if(order == null){
             return Optional.empty();
         }
+        this.entityManager.refresh(order);
         OrderDTO orderDTO = OrderMapper.INSTANCE.toDto(order);
         orderDTO.setOrderState(OrderStateEnum.valueOf(order.getOrderState().getId()));
         return Optional.of(orderDTO);
@@ -71,7 +72,6 @@ public class OrderRepositoryImpl extends AbstractRepository<Order> implements Or
                     OrderHasProducts ohp = new OrderHasProducts(new OrderHasProductsId(order.getId(), product.getId()));
                     ohp.setQuantity(product.getQuantityOrdered());
                     super.entityManager.persist(ohp);
-                    //super.entityManager.flush();
                 });
         return order;
     }// update()

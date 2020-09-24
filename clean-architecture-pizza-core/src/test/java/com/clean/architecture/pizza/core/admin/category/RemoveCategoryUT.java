@@ -37,16 +37,16 @@ public class RemoveCategoryUT {
     }// remove_category_should_throw_authentication_exception_when_user_isnt_logged()
 
     @Test
-    public void remove_category_should_success_when_id_exists() throws AuthenticationException, DatabaseException {
+    public void remove_category_should_success_when_id_exists() {
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
         Mockito.when(categoryRepository.existsById(1)).thenReturn(true);
-        Assertions.assertThat(removeCategory.execute(1)).isTrue();
+        Assertions.assertThatCode(() -> removeCategory.execute(1)).doesNotThrowAnyException();
     }// remove_category_should_success_when_id_exists()
 
     @Test
-    public void remove_category_should_fail_when_id_doesnt_exists() throws AuthenticationException, DatabaseException {
+    public void remove_category_should_fail_when_id_doesnt_exists() {
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
-        Assertions.assertThat(removeCategory.execute(2)).isFalse();
+        Assertions.assertThatCode(() -> removeCategory.execute(1)).doesNotThrowAnyException();
     }// remove_category_should_fail_when_id_doesnt_exists()
 
 }// RemoveCategoryUT

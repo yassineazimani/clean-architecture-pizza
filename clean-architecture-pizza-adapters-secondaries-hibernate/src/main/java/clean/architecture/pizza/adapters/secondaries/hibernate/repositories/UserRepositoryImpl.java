@@ -16,6 +16,7 @@ public class UserRepositoryImpl extends AbstractRepository<User> implements User
         if(user == null){
             return Optional.empty();
         }
+        this.entityManager.refresh(user);
         return Optional.of(UserMapper.INSTANCE.toDto(user));
     }// findById()
 

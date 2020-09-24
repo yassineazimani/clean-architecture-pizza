@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.core;
+package com.clean.architecture.pizza.adapters.primaries.core.usermode;
 
 import com.clean.architecture.pizza.adapters.primaries.bank.KitPaymentCardBank;
 import com.clean.architecture.pizza.core.enums.MoneyEnum;

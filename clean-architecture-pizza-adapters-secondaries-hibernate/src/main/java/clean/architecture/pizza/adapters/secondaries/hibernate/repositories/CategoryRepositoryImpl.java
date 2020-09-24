@@ -12,7 +12,9 @@ import org.apache.logging.log4j.Logger;
 
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CategoryRepositoryImpl extends AbstractRepository<Category>
         implements CategoryRepository {
@@ -25,17 +27,10 @@ public class CategoryRepositoryImpl extends AbstractRepository<Category>
     }// existsById()
 
     @Override
-    public void deleteById(int id) throws DatabaseException {
-        try {
-            this.entityManager.getTransaction().begin();
-            Query query = this.entityManager.createQuery("DELETE FROM Category c WHERE c.id = :id");
-            query.setParameter("id", Integer.valueOf(id));
-            query.executeUpdate();
-            this.entityManager.getTransaction().commit();
-        }catch(RollbackException re){
-            LOGGER.error(re.getMessage(), re);
-            throw new DatabaseException("Impossible to delete category with id " + id);
-        }
+    public void deleteById(int id) {
+        Query query = this.entityManager.createQuery("DELETE FROM Category c WHERE c.id = :id");
+        query.setParameter("id", Integer.valueOf(id));
+        query.executeUpdate();
     }// deleteById()
 
     @Override
@@ -44,6 +39,7 @@ public class CategoryRepositoryImpl extends AbstractRepository<Category>
         if(cat == null){
             return Optional.empty();
         }
+        this.entityManager.refresh(cat);
         return Optional.of(CategoryMapper.INSTANCE.toDto(cat));
     }// findById()
 
@@ -64,5 +60,15 @@ public class CategoryRepositoryImpl extends AbstractRepository<Category>
         c.setName(category.getName());
         super.update(c);
     }// update()
+
+    @Override
+    public List<CategoryDTO> findAll() {
+        List<Category> categories = this.entityManager.createQuery("SELECT c FROM Category c", Category.class)
+                .getResultList();
+        return categories.stream().map(cat -> {
+            this.entityManager.refresh(cat);
+            return CategoryMapper.INSTANCE.toDto(cat);
+        }).collect(Collectors.toList());
+    }// findAll()
 
 }// ProductRepositoryImpl
