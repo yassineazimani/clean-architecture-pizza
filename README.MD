@@ -33,6 +33,14 @@ Some cons :
 
 * Not practical for little application
 
+Some reading : 
+
+https://www.amazon.fr/Clean-Architecture-Robert-Martin-2016-12-10/dp/B01N2GDUQ9
+
+https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+
+https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/ 
+
 Hexagonal architecture used by this project : 
 
 ![Example console](images/architecture-pizza.png)
