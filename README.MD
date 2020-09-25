@@ -1,5 +1,39 @@
 ## Clean architecture : Pizza Automate
 
+### Building project
+
+First, you have to create two environment variables : 
+
+**PASSWORD_DB :** This is the password of your database (Hibernate JPA) account.
+
+**USER_DB :** This is the user identifiant of your database (Hibernate JPA) account.
+
+To build the project :
+
+```bash
+./gradlew clean build
+```
+
+To run the console application :
+
+```bash
+```
+
+To run the Spring Boot application :
+
+```bash
+```
+
+To run the swing application :
+
+```bash
+```
+
+To run the FX application :
+
+```bash
+```
+
 ### Description project
 
 This project was made to show hexagonal architecture power. It's a simple automate for customers who want to buy pizzas/drinks/desserts...
@@ -33,17 +67,11 @@ Some cons :
 
 * Not practical for little application
 
-Some reading : 
-
-https://www.amazon.fr/Clean-Architecture-Robert-Martin-2016-12-10/dp/B01N2GDUQ9
-
-https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
-
-https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/ 
-
 Hexagonal architecture used by this project : 
 
 ![Example console](images/architecture-pizza.png)
+
+### Screenshoots
 
 #### With Console
 
@@ -52,3 +80,11 @@ Hexagonal architecture used by this project :
 #### With REST Spring Boot
 
 ![Example console](images/example-spring-boot.jpg)
+
+### Resources 
+
+https://www.amazon.fr/Clean-Architecture-Robert-Martin-2016-12-10/dp/B01N2GDUQ9
+
+https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+
+https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/ 
