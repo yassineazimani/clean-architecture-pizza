@@ -6,6 +6,10 @@ This project was made to show hexagonal architecture power. It's a simple automa
 The customer goes to the automate (a touchscreen), then he chooses what he wants to eat (products/quantity). After the order, he can
 pay this one by coins or by bank card. Finally, the automate gives the order to the customer. 
 
+A admin can use the application to manage orders, products and look at statistics about orders...
+
+![Example console](images/usecases.png)
+
 ### Hexagonal architecture
 
 Thanks to the hexagonal architecture, we can focus only in the business logic of the application without knowing 
@@ -28,6 +32,10 @@ Some avantages :
 Some cons :
 
 * Not practical for little application
+
+Hexagonal architecture used by this project : 
+
+![Example console](images/architecture-pizza.png)
 
 #### With Console
 
