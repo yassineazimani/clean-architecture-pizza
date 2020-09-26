@@ -20,6 +20,7 @@ ext {
 dependencies {
     compile project(':clean-architecture-pizza-core')
     compile group: 'org.hibernate', name: 'hibernate-core', version: "${hibernateVersion}"
+    compile group: 'org.hibernate', name: 'hibernate-c3p0', version: "${hibernateVersion}"
     compile group: 'org.postgresql', name: 'postgresql', version: "${postgreSqlVersion}"
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4JVersion}"
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4JVersion}"
