@@ -8,6 +8,10 @@ package com.clean.architecture.pizza.core.ports;
  */
 public interface AuthenticationUser {
 
+    /**
+     * Indique si l'utilisateur est authentifié
+     * @return boolean
+     */
     boolean isAuthenticated();
 
 }// AuthenticationUser()

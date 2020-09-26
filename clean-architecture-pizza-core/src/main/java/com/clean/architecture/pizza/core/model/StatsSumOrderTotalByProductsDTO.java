@@ -9,12 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatsCountOrdersDTO {
+public class StatsSumOrderTotalByProductsDTO {
 
-    private long total;
+    private double total;
 
-    private int month;
-
-    private int year;
+    private String name;
 
 }// StatsCountOrdersDTO

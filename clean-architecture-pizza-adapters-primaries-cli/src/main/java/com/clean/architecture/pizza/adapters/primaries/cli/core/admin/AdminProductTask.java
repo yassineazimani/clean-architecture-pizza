@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * Cette classe gère l'administration des produits
+ * de l'application.
+ */
 public class AdminProductTask {
 
     private PersistProduct persistProduct;
@@ -29,6 +33,11 @@ public class AdminProductTask {
         this.scan = scan;
     }// AdminCategoryTask()
 
+    /**
+     * Exécution du choix sélectionné par l'utilisateur
+     * @param choice choix
+     * @return boolean déterminant si le retour au menu principal doit être effectué
+     */
     public boolean run(int choice) {
         boolean backToMainMenu = false;
         switch (choice) {
@@ -51,6 +60,9 @@ public class AdminProductTask {
         return backToMainMenu;
     }// run()
 
+    /**
+     * Création d'un produit
+     */
     private void createProduct() {
         boolean hasErrors = true;
         do {
@@ -83,6 +95,9 @@ public class AdminProductTask {
         } while (hasErrors);
     }// createProduct()
 
+    /**
+     * Mise à jour d'un produit
+     */
     private void updateProduct() {
         System.out.println("Product ID : ");
         Integer productId = null;
@@ -125,6 +140,9 @@ public class AdminProductTask {
                 });
     }// updateProduct()
 
+    /**
+     * Suppression d'un produit
+     */
     private void deleteProduct() {
         System.out.println("Product ID : ");
         int productId = -1;
@@ -144,6 +162,9 @@ public class AdminProductTask {
         }
     }// deleteProduct()
 
+    /**
+     * Affichage de tous les produits par catégorie
+     */
     private void fetchAllProducts() {
         Map<String, List<ProductDTO>> productsByCategory = this.fetchProducts.findAll(false);
         if (productsByCategory != null && !productsByCategory.isEmpty()) {

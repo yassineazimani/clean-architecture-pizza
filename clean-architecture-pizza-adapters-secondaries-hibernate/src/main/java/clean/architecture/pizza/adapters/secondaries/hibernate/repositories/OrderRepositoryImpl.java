@@ -7,10 +7,13 @@ import com.clean.architecture.pizza.core.enums.OrderStateEnum;
 import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.model.OrderDTO;
+import com.clean.architecture.pizza.core.model.StatsSumOrderTotalByProductsDTO;
 import com.clean.architecture.pizza.core.ports.OrderRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class OrderRepositoryImpl extends AbstractRepository<Order> implements OrderRepository {
 
@@ -75,5 +78,15 @@ public class OrderRepositoryImpl extends AbstractRepository<Order> implements Or
                 });
         return order;
     }// update()
+
+    @Override
+    public List<StatsSumOrderTotalByProductsDTO> getTotalSumByProducts() {
+        List<Object[]> results = this.entityManager
+                .createNativeQuery("select sum(total) as total, p.name from ordercmd o inner join order_has_products ohp on o.id = ohp.orderid inner join product p on ohp.productid = p.id group by p.name order by total")
+                .getResultList();
+        return results.stream()
+                .map(result -> new StatsSumOrderTotalByProductsDTO(((BigDecimal) result[0]).doubleValue(), String.valueOf(result[1])))
+                .collect(Collectors.toList());
+    }// getTotalSumByProducts()
 
 }// OrderRepositoryImpl

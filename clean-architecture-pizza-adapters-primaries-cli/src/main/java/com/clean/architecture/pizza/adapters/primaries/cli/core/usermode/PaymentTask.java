@@ -11,6 +11,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Scanner;
 
+/**
+ * Gestion du paiement une commande passée
+ * par un client.
+ */
 public class PaymentTask {
 
     private OrderProducts orderProducts;
@@ -21,6 +25,12 @@ public class PaymentTask {
         this.orderProducts = orderProducts;
     }// PaymentTask()
 
+    /**
+     * Paiement d'une commande
+     * @throws ArgumentMissingException
+     * @throws DatabaseException
+     * @throws OrderException
+     */
     public void paymentOrder() throws ArgumentMissingException, DatabaseException, OrderException {
         boolean keep = true;
         Scanner scan = new Scanner(System.in);

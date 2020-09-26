@@ -13,6 +13,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Cette classe gère l'administration des catégories
+ * de l'application.
+ */
 public class AdminCategoryTask {
 
     private PersistCategory persistCategory;
@@ -30,6 +34,11 @@ public class AdminCategoryTask {
         this.scan = scan;
     }// AdminCategoryTask()
 
+    /**
+     * Exécution du choix sélectionné par l'utilisateur
+     * @param choice choix
+     * @return boolean déterminant si le retour au menu principal doit être effectué
+     */
     public boolean run(int choice){
         boolean backToMainMenu = false;
         switch (choice){
@@ -52,6 +61,9 @@ public class AdminCategoryTask {
         return backToMainMenu;
     }// run()
 
+    /**
+     * Création d'une catégorie
+     */
     private void createCategory() {
         boolean hasErrors = true;
         do {
@@ -71,6 +83,9 @@ public class AdminCategoryTask {
         }while(hasErrors);
     }// createCategory()
 
+    /**
+     * Mise à jour d'une catégorie
+     */
     private void updateCategory() {
         System.out.println("Category ID : ");
         Integer categoryId = null;
@@ -100,6 +115,9 @@ public class AdminCategoryTask {
                 });
     }// updateCategory()
 
+    /**
+     * Suppression d'une catégorie
+     */
     private void deleteCategory() {
         System.out.println("Category ID : ");
         int categoryId = -1;
@@ -119,6 +137,9 @@ public class AdminCategoryTask {
         }
     }// deleteCategory()
 
+    /**
+     * Affichage de toutes les catégories
+     */
     private void fetchAllCategories(){
         List<CategoryDTO> categories = this.fetchCategory.findAll();
         if(CollectionUtils.isNotEmpty(categories)){

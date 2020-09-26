@@ -6,12 +6,17 @@ import com.clean.architecture.pizza.core.admin.category.PersistCategory;
 import com.clean.architecture.pizza.core.admin.category.RemoveCategory;
 import com.clean.architecture.pizza.core.admin.product.PersistProduct;
 import com.clean.architecture.pizza.core.admin.product.RemoveProduct;
+import com.clean.architecture.pizza.core.admin.stats.StatsOrders;
 import com.clean.architecture.pizza.core.fetch.FetchProducts;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Scanner;
 
+/**
+ * Cette classe gère l'administration des données
+ * de l'application.
+ */
 public class AdminTask {
 
     private Menu menu;
@@ -22,6 +27,8 @@ public class AdminTask {
 
     private AdminProductTask adminProductTask;
 
+    private AdminStatsTask adminStatsTask;
+
     private final static Logger LOGGER = LogManager.getLogger(AdminTask.class);
 
     public AdminTask(Menu menu,
@@ -30,13 +37,18 @@ public class AdminTask {
                      FetchCategory fetchCategory,
                      PersistProduct persistProduct,
                      RemoveProduct removeProduct,
-                     FetchProducts fetchProducts) {
+                     FetchProducts fetchProducts,
+                     StatsOrders statsOrders) {
         this.menu = menu;
         this.scan = new Scanner(System.in);
         this.adminCategoryTask = new AdminCategoryTask(persistCategory, removeCategory, fetchCategory, scan);
         this.adminProductTask = new AdminProductTask(persistProduct, removeProduct, fetchProducts, scan);
+        this.adminStatsTask = new AdminStatsTask(statsOrders);
     }// AdminTask()
 
+    /**
+     * Démarrage du mode administration
+     */
     public void main(){
         boolean quit = false;
         while(!quit){
@@ -46,6 +58,10 @@ public class AdminTask {
         }
     }// main()
 
+    /**
+     * Saisie clavier du choix de l'utilisateur
+     * @return choix saisi
+     */
     private int inputChoice(){
         int result = 1;
         boolean keep = true;
@@ -61,20 +77,27 @@ public class AdminTask {
         return result;
     }// inputChoice()
 
+    /**
+     * Exécution du choix sélectionné par l'utilisateur
+     * @param choice Choix
+     * @return boolean déterminant si l'application doit se terminer
+     */
     private boolean manageChoiceFromMainMenu(int choice){
         if(choice == 1){
             loopAdminMenuCategory();
         }else if(choice == 2){
             loopAdminMenuProduct();
         }else if(choice == 3){
-            menu.displayAdminMenuStats();
-            int choiceMenuStats = inputChoice();
+            loopAdminMenuStats();
         }else if(choice == 4){
             return true;
         }
         return false;
     }// manageChoiceFromMainMenu()
 
+    /**
+     * Ecran administration des catégories
+     */
     private void loopAdminMenuCategory(){
         boolean keep = true;
         do{
@@ -84,6 +107,9 @@ public class AdminTask {
         } while(keep);
     }// loopAdminMenuCategory()
 
+    /**
+     * Ecran administration des produits
+     */
     private void loopAdminMenuProduct(){
         boolean keep = true;
         do{
@@ -92,5 +118,17 @@ public class AdminTask {
             keep = !this.adminProductTask.run(choiceMenuProduct);
         }while(keep);
     }// loopAdminMenuProduct()
+
+    /**
+     * Ecran administration des statistiques
+     */
+    private void loopAdminMenuStats(){
+        boolean keep = true;
+        do{
+            menu.displayAdminMenuStats();
+            int choiceMenuStats = inputChoice();
+            keep = !this.adminStatsTask.run(choiceMenuStats);
+        }while(keep);
+    }// loopAdminMenuStats()
 
 }// AdminTask

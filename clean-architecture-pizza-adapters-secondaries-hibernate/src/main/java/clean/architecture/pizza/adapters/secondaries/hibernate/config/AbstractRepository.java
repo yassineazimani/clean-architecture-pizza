@@ -22,6 +22,11 @@ public abstract class AbstractRepository<T> {
         this.entityManager = factory.createEntityManager();
     }// AbstractRepository()
 
+    /**
+     * Sauvegarde d'une entité
+     * @param entity
+     * @throws DatabaseException
+     */
     public void save(T entity) throws DatabaseException {
         if(entity != null){
             try {
@@ -34,6 +39,11 @@ public abstract class AbstractRepository<T> {
         }
     }// save()
 
+    /**
+     * Mise à jour d'une entité
+     * @param entity
+     * @throws DatabaseException
+     */
     public void update(T entity) throws DatabaseException {
         if(entity != null){
             try {

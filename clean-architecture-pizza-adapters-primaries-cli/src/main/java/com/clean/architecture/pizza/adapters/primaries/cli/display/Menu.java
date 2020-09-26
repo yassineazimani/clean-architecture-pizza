@@ -10,6 +10,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Gestion de l'affichage des différents menus
+ * de l'application.
+ */
 public class Menu {
 
     private FetchProducts fetchProducts;
@@ -18,6 +22,10 @@ public class Menu {
         this.fetchProducts = new FetchProducts(new ProductRepositoryImpl());
     }// Menu()
 
+    /**
+     * Affichage du menu principal pour un client
+     * @return Produits affichés
+     */
     public List<ProductDTO> displayMenu(){
         Map<String, List<ProductDTO>> productsByCategory = this.fetchProducts.findAll();
         List<ProductDTO> allProducts = new ArrayList<>();
@@ -36,6 +44,9 @@ public class Menu {
         return allProducts;
     }// displayMenu()
 
+    /**
+     * Affichage du menu principal pour l'administrateur
+     */
     public void displayAdminMenu(){
         System.out.println("########################### MENU ########################");
         System.out.println();
@@ -45,6 +56,9 @@ public class Menu {
         System.out.println("4. Quit");
     }// displayAdminMenu()
 
+    /**
+     * Affichage du menu de la gestion des catégories pour l'administrateur
+     */
     public void displayAdminMenuCategory(){
         System.out.println("########################### MANAGE CATEGORIES ########################");
         System.out.println();
@@ -55,6 +69,9 @@ public class Menu {
         System.out.println("5. Back to main menu");
     }// displayAdminMenuCategory()
 
+    /**
+     * Affichage du menu de la gestion des produits pour l'administrateur
+     */
     public void displayAdminMenuProduct(){
         System.out.println("########################### MANAGE PRODUCTS ########################");
         System.out.println();
@@ -65,8 +82,13 @@ public class Menu {
         System.out.println("5. Back to main menu");
     }// displayAdminMenuProduct()
 
+    /**
+     * Affichage du menu de la gestion des statistiques pour l'administrateur
+     */
     public void displayAdminMenuStats(){
         System.out.println("########################### STATISTICS ########################");
+        System.out.println("1. Get all total sum of products selled");
+        System.out.println("2. Back to main menu");
         System.out.println();
     }// displayAdminMenuStats()
 

@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Gestion des commandes passées par
+ * un client.
+ */
 public class OrderTask {
 
     private Menu menu;
@@ -32,6 +36,9 @@ public class OrderTask {
         this.fetchProducts = fetchProducts;
     }// OrderTask()
 
+    /**
+     * Sélection d'une commande par un client.
+     */
     public void takeOrder() {
         boolean finishOrder = false;
         while(!finishOrder) {
@@ -56,6 +63,10 @@ public class OrderTask {
         }
     }// takeOrder()
 
+    /**
+     * Termine la commande d'un client.
+     * @return boolean
+     */
     private boolean finishOrder(){
         boolean keep = true;
         boolean result = false;
@@ -73,6 +84,10 @@ public class OrderTask {
         return result;
     }// finishOrder()
 
+    /**
+     * Sélection d'un produit par un client
+     * @return identifiant du produit sélectionné
+     */
     private Integer choiceProduct(){
         boolean keep = true;
         int result = 1;
@@ -95,6 +110,12 @@ public class OrderTask {
         return result;
     }// choiceProduct()
 
+    /**
+     * Sélection de la quantité du produit sélectionné
+     * par un client.
+     * @param productIdSelected Identifiant du produit sélectionné
+     * @return quantité saisie
+     */
     private Integer choiceQuantity(int productIdSelected){
         boolean keep = true;
         int result = 1;
