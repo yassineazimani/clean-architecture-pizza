@@ -52,7 +52,14 @@ public class PaymentTask {
             final String transactionCbId = KitPaymentCardBank.payment();
             orderProducts.paymentOrder(MoneyEnum.CB, transactionCbId);
         }
+        System.out.println();
         System.out.println("Thank you ! Good meal and see you soon !");
+        System.out.println();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }// paymentOrder()
 
 }// PaymentTask
