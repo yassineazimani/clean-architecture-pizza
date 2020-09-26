@@ -1,6 +1,6 @@
-package com.clean.architecture.pizza.adapters.primaries;
+package com.clean.architecture.pizza.adapters.primaries.cli;
 
-import com.clean.architecture.pizza.adapters.primaries.core.AppTask;
+import com.clean.architecture.pizza.adapters.primaries.cli.core.AppTask;
 
 public class Application {
 

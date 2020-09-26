@@ -2,6 +2,7 @@ package com.clean.architecture.pizza.core.admin.product;
 
 import com.clean.architecture.pizza.core.exceptions.AuthenticationException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
+import com.clean.architecture.pizza.core.exceptions.ProductException;
 import com.clean.architecture.pizza.core.ports.AuthenticationUser;
 import com.clean.architecture.pizza.core.ports.ProductRepository;
 import org.assertj.core.api.Assertions;
@@ -37,14 +38,14 @@ public class RemoveProductUT {
     }// remove_product_should_throw_authentication_exception_when_user_isnt_logged()
 
     @Test
-    public void remove_product_should_success_when_id_exists() throws AuthenticationException, DatabaseException {
+    public void remove_product_should_success_when_id_exists() throws AuthenticationException, DatabaseException, ProductException {
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
         Mockito.when(productRepository.existsById(1)).thenReturn(true);
         Assertions.assertThat(removeProduct.execute(1)).isTrue();
     }// remove_product_should_success_when_id_exists()
 
     @Test
-    public void remove_product_should_fail_when_id_doesnt_exists() throws AuthenticationException, DatabaseException {
+    public void remove_product_should_fail_when_id_doesnt_exists() throws AuthenticationException, DatabaseException, ProductException {
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
         Assertions.assertThat(removeProduct.execute(2)).isFalse();
     }// remove_product_should_fail_when_id_doesnt_exists()

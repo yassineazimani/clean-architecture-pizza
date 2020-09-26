@@ -1,6 +1,6 @@
-package com.clean.architecture.pizza.adapters.primaries.core.usermode;
+package com.clean.architecture.pizza.adapters.primaries.cli.core.usermode;
 
-import com.clean.architecture.pizza.adapters.primaries.display.Menu;
+import com.clean.architecture.pizza.adapters.primaries.cli.display.Menu;
 import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.exceptions.OrderException;

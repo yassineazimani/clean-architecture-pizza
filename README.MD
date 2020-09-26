@@ -14,6 +14,11 @@ To build the project :
 ./gradlew clean build
 ```
 
+The admin account is the following :
+
+ID : 109856
+pw : password
+
 To run the console application :
 
 ```bash

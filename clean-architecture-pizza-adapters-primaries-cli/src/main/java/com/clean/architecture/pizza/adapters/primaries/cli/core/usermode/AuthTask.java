@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.core.usermode;
+package com.clean.architecture.pizza.adapters.primaries.cli.core.usermode;
 
 import com.clean.architecture.pizza.core.admin.auth.FetchUser;
 import com.clean.architecture.pizza.core.model.UserDTO;

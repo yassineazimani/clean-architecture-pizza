@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.config;
+package com.clean.architecture.pizza.adapters.primaries.cli.config;
 
 import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.CategoryRepositoryImpl;
 import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.OrderRepositoryImpl;
@@ -9,6 +9,8 @@ import com.clean.architecture.pizza.core.admin.auth.FetchUser;
 import com.clean.architecture.pizza.core.admin.category.FetchCategory;
 import com.clean.architecture.pizza.core.admin.category.PersistCategory;
 import com.clean.architecture.pizza.core.admin.category.RemoveCategory;
+import com.clean.architecture.pizza.core.admin.product.PersistProduct;
+import com.clean.architecture.pizza.core.admin.product.RemoveProduct;
 import com.clean.architecture.pizza.core.fetch.FetchProducts;
 import com.clean.architecture.pizza.core.order.OrderProducts;
 import com.clean.architecture.pizza.core.ports.AuthenticationUser;
@@ -38,5 +40,13 @@ public class Configuration {
     public static FetchCategory fetchCategory() {
         return new FetchCategory(new CategoryRepositoryImpl());
     }// fetchCategory()
+
+    public static PersistProduct persistProduct(AuthenticationUser authenticationUser) {
+        return new PersistProduct(new ProductRepositoryImpl(), authenticationUser);
+    }// persistProduct()
+
+    public static RemoveProduct removeProduct(AuthenticationUser authenticationUser) {
+        return new RemoveProduct(new ProductRepositoryImpl(), authenticationUser);
+    }// persistProduct()
 
 }// Configuration

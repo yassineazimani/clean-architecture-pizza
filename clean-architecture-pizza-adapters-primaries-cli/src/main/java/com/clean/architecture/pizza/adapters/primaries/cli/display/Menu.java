@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.display;
+package com.clean.architecture.pizza.adapters.primaries.cli.display;
 
 import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.ProductRepositoryImpl;
 import com.clean.architecture.pizza.core.fetch.FetchProducts;

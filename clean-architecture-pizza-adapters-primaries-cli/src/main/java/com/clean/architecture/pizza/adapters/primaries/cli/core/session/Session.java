@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.core.session;
+package com.clean.architecture.pizza.adapters.primaries.cli.core.session;
 
 import com.clean.architecture.pizza.core.model.UserDTO;
 import com.clean.architecture.pizza.core.ports.AuthenticationUser;

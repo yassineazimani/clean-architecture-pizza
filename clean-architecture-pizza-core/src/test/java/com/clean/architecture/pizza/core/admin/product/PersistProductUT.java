@@ -28,14 +28,11 @@ public class PersistProductUT {
     private ProductRepository productRepository;
 
     @Mock
-    private CategoryRepository categoryRepository;
-
-    @Mock
     private AuthenticationUser authenticationUser;
 
     @Before
     public void setUp(){
-        this.persistProduct = new PersistProduct(productRepository, categoryRepository, authenticationUser);
+        this.persistProduct = new PersistProduct(productRepository, authenticationUser);
     }// setUp()
 
     @Test

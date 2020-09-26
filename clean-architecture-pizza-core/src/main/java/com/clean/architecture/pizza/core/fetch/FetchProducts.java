@@ -21,14 +21,23 @@ public class FetchProducts {
     /**
      * Récupération de tous les produits de l'application.
      * Si un type de produit n'est plus disponible, la clé de la map représentant
-     * la catégorie sera alors absente.
+     * la catégorie sera alors absente si le paramètre removeUnavailableProducts est à true.
+     * @param removeUnavailableProducts Remove unavailable products.
      * @return Map de {@see Product} regroupés par nom de Catégorie (Pizzas, Boissons, Desserts).
      */
-    public Map<String, List<ProductDTO>> findAll() {
+    public Map<String, List<ProductDTO>> findAll(boolean removeUnavailableProducts) {
         List<ProductDTO> products = productRepository.findAllProducts();
+        if(removeUnavailableProducts){
+            return products.stream()
+                    .filter(product -> product.getQuantityAvailable() > 0)
+                    .collect(Collectors.groupingBy(p -> p.getCategory().getName()));
+        }
         return products.stream()
-                .filter(product -> product.getQuantityAvailable() > 0)
                 .collect(Collectors.groupingBy(p -> p.getCategory().getName()));
+    }// findAll()
+
+    public Map<String, List<ProductDTO>> findAll() {
+        return this.findAll(true);
     }// findAll()
 
     /**

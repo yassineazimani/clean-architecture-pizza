@@ -38,6 +38,18 @@ public class FetchProductsUT {
     }// find_all_should_return_empty_list_when_no_products_are_available()
 
     @Test
+    public void find_all_should_return_pizza_drink_dessert_when_no_pizza_no_drinks_no_desserts_are_available(){
+        ProductDTO pizza = ProductsStub.getPizza4Fromages(0);
+        ProductDTO drink = ProductsStub.getOrangina(0);
+        ProductDTO dessert = ProductsStub.getLemonPie(0);
+        Mockito.when(productRepository.findAllProducts())
+                .thenReturn(Stream.of(pizza, drink, dessert).collect(Collectors.toList()));
+        Map<String, List<ProductDTO>> products = this.fetchProducts.findAll(false);
+        Assertions.assertThat(products).isNotEmpty();
+        Assertions.assertThat(products).hasSize(3);
+    }// find_all_should_return_pizza_drink_dessert_when_no_pizza_no_drinks_no_desserts_are_available()
+
+    @Test
     public void find_all_should_return_empty_list_when_no_pizza_no_drinks_no_desserts_are_available(){
         ProductDTO pizza = ProductsStub.getPizza4Fromages(0);
         ProductDTO drink = ProductsStub.getOrangina(0);

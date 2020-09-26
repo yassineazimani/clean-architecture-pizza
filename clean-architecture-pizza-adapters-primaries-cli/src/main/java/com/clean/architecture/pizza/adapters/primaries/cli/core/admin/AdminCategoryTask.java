@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.core.admin;
+package com.clean.architecture.pizza.adapters.primaries.cli.core.admin;
 
 import com.clean.architecture.pizza.core.admin.category.FetchCategory;
 import com.clean.architecture.pizza.core.admin.category.PersistCategory;
@@ -111,7 +111,7 @@ public class AdminCategoryTask {
         try {
             this.removeCategory.execute(categoryId);
         } catch (AuthenticationException e) {
-            System.err.println("You don't have the rights to update a category");
+            System.err.println("You don't have the rights to remove a category");
         } catch (DatabaseException e) {
             System.err.println("Technical error : Impossible to remove a category");
         } catch (CategoryException e) {

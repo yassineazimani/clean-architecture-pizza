@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries;
+package com.clean.architecture.pizza.adapters.rest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

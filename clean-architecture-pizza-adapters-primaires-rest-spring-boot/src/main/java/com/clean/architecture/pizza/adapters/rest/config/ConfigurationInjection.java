@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.config;
+package com.clean.architecture.pizza.adapters.rest.config;
 
 import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.ProductRepositoryImpl;
 import com.clean.architecture.pizza.core.fetch.FetchProducts;

@@ -1,9 +1,12 @@
-package com.clean.architecture.pizza.adapters.primaries.core.admin;
+package com.clean.architecture.pizza.adapters.primaries.cli.core.admin;
 
-import com.clean.architecture.pizza.adapters.primaries.display.Menu;
+import com.clean.architecture.pizza.adapters.primaries.cli.display.Menu;
 import com.clean.architecture.pizza.core.admin.category.FetchCategory;
 import com.clean.architecture.pizza.core.admin.category.PersistCategory;
 import com.clean.architecture.pizza.core.admin.category.RemoveCategory;
+import com.clean.architecture.pizza.core.admin.product.PersistProduct;
+import com.clean.architecture.pizza.core.admin.product.RemoveProduct;
+import com.clean.architecture.pizza.core.fetch.FetchProducts;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,15 +20,21 @@ public class AdminTask {
 
     private AdminCategoryTask adminCategoryTask;
 
+    private AdminProductTask adminProductTask;
+
     private final static Logger LOGGER = LogManager.getLogger(AdminTask.class);
 
     public AdminTask(Menu menu,
                      PersistCategory persistCategory,
                      RemoveCategory removeCategory,
-                     FetchCategory fetchCategory) {
+                     FetchCategory fetchCategory,
+                     PersistProduct persistProduct,
+                     RemoveProduct removeProduct,
+                     FetchProducts fetchProducts) {
         this.menu = menu;
         this.scan = new Scanner(System.in);
         this.adminCategoryTask = new AdminCategoryTask(persistCategory, removeCategory, fetchCategory, scan);
+        this.adminProductTask = new AdminProductTask(persistProduct, removeProduct, fetchProducts, scan);
     }// AdminTask()
 
     public void main(){
@@ -56,8 +65,7 @@ public class AdminTask {
         if(choice == 1){
             loopAdminMenuCategory();
         }else if(choice == 2){
-            menu.displayAdminMenuProduct();
-            int choiceMenuProduct = inputChoice();
+            loopAdminMenuProduct();
         }else if(choice == 3){
             menu.displayAdminMenuStats();
             int choiceMenuStats = inputChoice();
@@ -75,5 +83,14 @@ public class AdminTask {
             keep = !this.adminCategoryTask.run(choiceMenuCategory);
         } while(keep);
     }// loopAdminMenuCategory()
+
+    private void loopAdminMenuProduct(){
+        boolean keep = true;
+        do{
+            menu.displayAdminMenuProduct();
+            int choiceMenuProduct = inputChoice();
+            keep = !this.adminProductTask.run(choiceMenuProduct);
+        }while(keep);
+    }// loopAdminMenuProduct()
 
 }// AdminTask

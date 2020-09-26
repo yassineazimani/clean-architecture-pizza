@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.bank;
+package com.clean.architecture.pizza.adapters.primaries.cli.bank;
 
 import org.apache.commons.lang3.RandomStringUtils;
 

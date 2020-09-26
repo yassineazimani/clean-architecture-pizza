@@ -1,12 +1,8 @@
 package com.clean.architecture.pizza.core.admin.product;
 
-import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
-import com.clean.architecture.pizza.core.exceptions.AuthenticationException;
-import com.clean.architecture.pizza.core.exceptions.DatabaseException;
-import com.clean.architecture.pizza.core.exceptions.ProductException;
+import com.clean.architecture.pizza.core.exceptions.*;
 import com.clean.architecture.pizza.core.model.ProductDTO;
 import com.clean.architecture.pizza.core.ports.AuthenticationUser;
-import com.clean.architecture.pizza.core.ports.CategoryRepository;
 import com.clean.architecture.pizza.core.ports.ProductRepository;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,15 +14,11 @@ public class PersistProduct {
 
     private ProductRepository productRepository;
 
-    private CategoryRepository categoryRepository;
-
     private AuthenticationUser authenticationUser;
 
     public PersistProduct(ProductRepository productRepository,
-                          CategoryRepository categoryRepository,
                           AuthenticationUser authenticationUser) {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
         this.authenticationUser = authenticationUser;
     }// PersistProduct()
 
@@ -35,7 +27,14 @@ public class PersistProduct {
             throw new AuthenticationException("You need to login");
         }
         checkBusiness(product, false);
-        this.productRepository.save(product);
+        try{
+            this.productRepository.begin();
+            this.productRepository.save(product);
+            this.productRepository.commit();
+        } catch (TransactionException e) {
+            this.productRepository.rollback();
+            throw new ProductException("Error technical : Impossible to create a product");
+        }
     }// save()
 
     public void update(ProductDTO product) throws ArgumentMissingException, ProductException, AuthenticationException, DatabaseException {
@@ -43,7 +42,14 @@ public class PersistProduct {
             throw new AuthenticationException("You need to login");
         }
         checkBusiness(product, true);
-        this.productRepository.update(product);
+        try{
+            this.productRepository.begin();
+            this.productRepository.update(product);
+            this.productRepository.commit();
+        } catch (TransactionException e) {
+            this.productRepository.rollback();
+            throw new ProductException("Error technical : Impossible to update a product");
+        }
     }// update()
 
     private void checkBusiness(ProductDTO product, boolean isUpdate) throws ProductException, ArgumentMissingException {

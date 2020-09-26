@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.config;
+package com.clean.architecture.pizza.adapters.primaries.cli.config;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.clean.architecture.pizza.core.ports.PasswordEncoder;

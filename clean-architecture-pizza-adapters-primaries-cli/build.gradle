@@ -11,6 +11,18 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.clean.architecture.pizza.adapters.primaries.cli.Application'
+    }
+    println(configurations)
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    archiveName 'cli.jar'
+}
+
 dependencies {
     compile group: 'at.favre.lib', name: 'bcrypt', version: "${bcryptVersion}"
     compile project(':clean-architecture-pizza-core')

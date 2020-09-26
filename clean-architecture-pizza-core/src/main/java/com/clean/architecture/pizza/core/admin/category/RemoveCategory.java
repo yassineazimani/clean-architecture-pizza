@@ -31,7 +31,7 @@ public class RemoveCategory {
             this.categoryRepository.commit();
         }catch (TransactionException te){
             this.categoryRepository.rollback();
-            throw new CategoryException("Error technical : Impossible to create a category");
+            throw new CategoryException("Error technical : Impossible to remove a category");
         }
     }// execute()
 

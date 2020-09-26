@@ -1,4 +1,4 @@
-package com.clean.architecture.pizza.adapters.primaries.endpoints;
+package com.clean.architecture.pizza.adapters.rest.endpoints;
 
 import com.clean.architecture.pizza.core.fetch.FetchProducts;
 import org.springframework.beans.factory.annotation.Autowired;
