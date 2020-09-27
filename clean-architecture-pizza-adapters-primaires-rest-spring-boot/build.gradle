@@ -12,6 +12,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    jwtVersion = '0.9.1'
+}
+
 dependencies {
     compile project(':clean-architecture-pizza-core')
     compile project(':clean-architecture-pizza-adapters-secondaries-hibernate')
@@ -21,6 +25,8 @@ dependencies {
     implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
     implementation 'org.springframework.boot:spring-boot-starter'
     compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-security'
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version: "${jwtVersion}"
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
