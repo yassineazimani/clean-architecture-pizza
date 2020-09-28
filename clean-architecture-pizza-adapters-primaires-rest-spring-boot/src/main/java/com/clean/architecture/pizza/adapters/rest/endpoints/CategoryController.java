@@ -42,8 +42,14 @@ public class CategoryController {
      */
     private FetchCategory fetchCategoriesService;
 
+    /**
+     * Cas d'utilisations concernant la persistance d'une catégorie
+     */
     private PersistCategory persistCategory;
 
+    /**
+     * Cas d'utilisations concernant la suppression d'une catégorie
+     */
     private RemoveCategory removeCategory;
 
     /**
@@ -80,6 +86,11 @@ public class CategoryController {
         return ResponseEntity.ok(this.fetchCategoriesService.findById(id));
     }// getCategoryById()
 
+    /**
+     * Création d'une catégorie
+     * @param categoryToPersist Catégorie à créer
+     * @return ResponseEntity
+     */
     @PostMapping("/admin/category")
     public ResponseEntity<?> createCategory(@RequestBody FormCategoryDTO categoryToPersist){
         try {
@@ -96,6 +107,11 @@ public class CategoryController {
         }
     }// createCategory()
 
+    /**
+     * Mise à jour d'une catégorie
+     * @param categoryToUpdate Catégorie à mettre à jour
+     * @return ResponseEntity
+     */
     @PutMapping("/admin/category")
     public ResponseEntity<?> updateCategory(@RequestBody FormCategoryDTO categoryToUpdate){
         try {
@@ -112,6 +128,11 @@ public class CategoryController {
         }
     }// updateCategory()
 
+    /**
+     * Suppression d'une catégorie
+     * @param id Identifiant d'une catégorie à supprimer
+     * @return ResponseEntity
+     */
     @DeleteMapping("/admin/category/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Integer id){
         try {

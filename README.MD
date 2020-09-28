@@ -21,20 +21,81 @@ The admin account is the following :
 ID : 109856
 pw : password
 
+#### Console 
+
 To run the console application :
 
 ```bash
 ```
+
+If you want to login as admin you have to write id and password as arguments.
+
+Example :
+
+```bash
+    java -jar cli.jar 109856 password
+```
+
+#### Spring Boot
 
 To run the Spring Boot application :
 
 ```bash
 ```
 
+To use a public endpoint :
+
+```bash
+curl "http://localhost:8080/api/public/{endpoint}"
+```
+
+Example :
+
+```bash
+curl "http://localhost:8080/api/public/categories"
+```
+
+My spring boot application uses JWT authentication to login.
+
+More informations : https://jwt.io/ 
+
+To login as admin :
+
+```bash
+curl "http://localhost:8080/api/auth/login" \
+  -X POST \
+  -d "{ \"id\": \"109856\", \"password\": \"password\" }" \
+  -H "Content-Type: application/json" 
+```
+
+To use an admin endpoint :
+
+```bash
+curl "http://localhost:8080/api/admin/{endpoint}" \
+  -X POST \
+  -d "{ \"name\": \"\" }" \
+  -H "Authorization: Bearer {Bearer given by endpoint login}" \
+  -H "Content-Type: application/json" 
+```
+
+Example :
+
+```bash
+curl "http://localhost:8080/api/admin/category" \
+  -X POST \
+  -d "{ \"name\": \"Sandwichs\" }" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2MDEzMTU1NTQsImlhdCI6MTYwMTMxMzc1NCwic3ViIjoiMTA5ODU2IiwiaWQiOiIxMDk4NTYifQ.RhR37VwCpnOpQNRqYAuyCWAawqXF-WR2cxqZbnYFgHc9QzqoiZw0Gl_t_4WrnYAlUk4ku_Ta0Vd_1g453e1IYw" \
+  -H "Content-Type: application/json" 
+```
+
+#### Swing
+
 To run the swing application :
 
 ```bash
 ```
+
+#### FX
 
 To run the FX application :
 
@@ -77,6 +138,16 @@ Some cons :
 Hexagonal architecture used by this project : 
 
 ![Example console](images/architecture-pizza.png)
+
+### Where can i change adapters around the business logic in the user application ?
+
+#### Console
+
+#### Spring boot
+
+#### Swing
+
+#### FX
 
 ### Screenshoots
 
