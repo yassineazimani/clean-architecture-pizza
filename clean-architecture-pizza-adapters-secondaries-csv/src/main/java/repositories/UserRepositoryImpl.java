@@ -18,14 +18,57 @@ package repositories;
 import com.clean.architecture.pizza.core.exceptions.TransactionException;
 import com.clean.architecture.pizza.core.model.UserDTO;
 import com.clean.architecture.pizza.core.ports.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import utils.DataBaseHelper;
+import utils.MappingEnum;
 
-import java.util.Optional;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 public class UserRepositoryImpl implements UserRepository {
 
+    private String pathUserDbFile;
+
+    private final static Logger LOGGER = LogManager.getLogger(UserRepositoryImpl.class);
+
+    public UserRepositoryImpl() {
+        try {
+            Properties properties = new DataBaseHelper().getProperties();
+            this.pathUserDbFile = properties.getProperty("path.user.db");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }// UserRepositoryImpl()
+
     @Override
     public Optional<UserDTO> findById(int id) {
-        return Optional.empty();
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new File(this.pathUserDbFile));
+            final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
+            while (scanner.hasNext()) {
+                List<String> row = DataBaseHelper.parseRow(scanner);
+                String columnValue = row.get(columns.get(MappingEnum.ID.getName()));
+                if(columnValue != null && String.valueOf(id).equals(columnValue)){
+                    UserDTO userDTO = new UserDTO(
+                            Integer.valueOf(row.get(columns.get(MappingEnum.ID.getName()))),
+                            row.get(columns.get(MappingEnum.PASSWORD.getName()))
+                    );
+                    return Optional.of(userDTO);
+                }
+            }
+            return Optional.empty();
+        } catch (FileNotFoundException e) {
+            LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
+            return Optional.empty(); // Dans la pratique, on remonterait l'exception avec DataBaseException
+        } finally{
+            if(scanner != null){
+                scanner.close();
+            }
+        }
     }// findById()
 
     @Override

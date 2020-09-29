@@ -17,7 +17,8 @@ package utils;
 
 public enum MappingEnum {
     ID("id"),
-    NAME("name");
+    NAME("name"),
+    PASSWORD("password");
 
     private String name;
 
