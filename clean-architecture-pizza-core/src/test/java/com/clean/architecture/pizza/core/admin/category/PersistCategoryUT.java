@@ -71,6 +71,16 @@ public class PersistCategoryUT {
     }// save_category_should_throw_category_exception_when_fields_mandatory_are_missing()
 
     @Test
+    public void save_category_should_throw_category_exception_when_a_category_with_same_name_exists(){
+        Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
+        Mockito.when(categoryRepository.existsByName("sandwichs"))
+                .thenReturn(true);
+        Assertions.assertThatCode(() -> persistCategory.save(new CategoryDTO(null, "sandwichs")))
+                .hasMessage("A category with the name sandwichs already exists")
+                .isInstanceOf(CategoryException.class);
+    }// save_category_should_throw_category_exception_when_a_category_with_same_name_exists()
+
+    @Test
     public void save_category_should_success_when_user_is_logged_and_fields_are_given(){
         Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
         Assertions.assertThatCode(() -> persistCategory.save(new CategoryDTO(null, "Pizzas")))

@@ -23,6 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PersistCategory {
@@ -80,6 +81,12 @@ public class PersistCategory {
             if(CollectionUtils.isNotEmpty(errors)){
                 CategoryException ce = new CategoryException("Mandatory fields are missing");
                 ce.setFieldsErrors(errors);
+                throw ce;
+            }
+            if(this.categoryRepository.existsByName(category.getName())){
+                final String error = "A category with the name " + category.getName() + " already exists";
+                CategoryException ce = new CategoryException(error);
+                ce.setFieldsErrors(Collections.singletonList(error));
                 throw ce;
             }
         }

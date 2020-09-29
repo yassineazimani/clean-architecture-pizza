@@ -17,6 +17,7 @@ package com.clean.architecture.pizza.core.admin.product;
 
 import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
 import com.clean.architecture.pizza.core.exceptions.AuthenticationException;
+import com.clean.architecture.pizza.core.exceptions.CategoryException;
 import com.clean.architecture.pizza.core.exceptions.ProductException;
 import com.clean.architecture.pizza.core.model.CategoryDTO;
 import com.clean.architecture.pizza.core.model.ProductDTO;
@@ -72,6 +73,18 @@ public class PersistProductUT {
                 .hasMessage("Mandatory fields are missing")
                 .isInstanceOf(ProductException.class);
     }// save_product_should_throw_product_exception_when_fields_mandatory_are_missing()
+
+    @Test
+    public void save_product_should_throw_product_exception_when_a_product_with_same_name_exists(){
+        Mockito.when(authenticationUser.isAuthenticated()).thenReturn(true);
+        ProductDTO pizza = ProductsStub.getPizza4Fromages(5);
+        pizza.setId(null);
+        Mockito.when(productRepository.existsByName(pizza.getName()))
+                .thenReturn(true);
+        Assertions.assertThatCode(() -> persistProduct.save(pizza))
+                .hasMessage("A product with the name " + pizza.getName() + " already exists")
+                .isInstanceOf(ProductException.class);
+    }// save_product_should_throw_product_exception_when_a_product_with_same_name_exists()
 
     @Test
     public void save_product_should_success_when_user_is_logged_and_fields_are_given(){

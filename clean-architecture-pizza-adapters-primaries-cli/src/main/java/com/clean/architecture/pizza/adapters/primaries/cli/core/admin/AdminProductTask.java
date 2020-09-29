@@ -98,7 +98,7 @@ public class AdminProductTask {
                 persistProduct.save(productDto);
                 hasErrors = false;
             } catch (ProductException e) {
-                e.getFieldsErrors().forEach(System.out::println);
+                e.getFieldsErrors().forEach(System.err::println);
             } catch (AuthenticationException e) {
                 System.err.println("You don't have the rights to create a product");
             } catch (ArgumentMissingException | DatabaseException e) {
@@ -142,7 +142,7 @@ public class AdminProductTask {
                             persistProduct.update(productDto);
                             hasErrors = false;
                         } catch (ProductException e) {
-                            e.getFieldsErrors().forEach(System.out::println);
+                            e.getFieldsErrors().forEach(System.err::println);
                         } catch (AuthenticationException e) {
                             System.err.println("You don't have the rights to update a product");
                         } catch (ArgumentMissingException | DatabaseException e) {
@@ -173,7 +173,7 @@ public class AdminProductTask {
         } catch (DatabaseException e) {
             System.err.println("Technical error : Impossible to remove a product");
         } catch (ProductException e) {
-            e.getFieldsErrors().forEach(System.out::println);
+            e.getFieldsErrors().forEach(System.err::println);
         }
     }// deleteProduct()
 

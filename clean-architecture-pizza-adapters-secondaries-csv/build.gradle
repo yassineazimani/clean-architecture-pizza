@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+group 'com.clean.architecture.pizza'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':clean-architecture-pizza-core')
+    compile group: 'commons-io', name: 'commons-io', version: "${commonsIoVersion}"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

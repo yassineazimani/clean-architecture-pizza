@@ -89,7 +89,7 @@ public class AdminCategoryTask {
                 persistCategory.save(cat);
                 hasErrors = false;
             } catch (CategoryException e) {
-                e.getFieldsErrors().forEach(System.out::println);
+                e.getFieldsErrors().forEach(System.err::println);
             } catch (AuthenticationException e) {
                 System.err.println("You don't have the rights to create a category");
             } catch (ArgumentMissingException | DatabaseException e) {
@@ -120,7 +120,7 @@ public class AdminCategoryTask {
                             persistCategory.update(cat);
                             hasErrors = false;
                         } catch (CategoryException e) {
-                            e.getFieldsErrors().forEach(System.out::println);
+                            e.getFieldsErrors().forEach(System.err::println);
                         } catch (AuthenticationException e) {
                             System.err.println("You don't have the rights to update a category");
                         } catch (ArgumentMissingException | DatabaseException e) {
@@ -148,7 +148,7 @@ public class AdminCategoryTask {
         } catch (DatabaseException e) {
             System.err.println("Technical error : Impossible to remove a category");
         } catch (CategoryException e) {
-            e.getFieldsErrors().forEach(System.out::println);
+            e.getFieldsErrors().forEach(System.err::println);
         }
     }// deleteCategory()
 

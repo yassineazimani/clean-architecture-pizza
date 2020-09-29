@@ -26,6 +26,13 @@ public interface CategoryRepository extends ManagementTransaction{
 
     /**
      * Vérifie l'existence d'une catégorie
+     * @param name Nom de la catégorie
+     * @return boolean
+     */
+    boolean existsByName(String name);
+
+    /**
+     * Vérifie l'existence d'une catégorie
      * @param id Identifiant de la catégorie
      * @return boolean
      */

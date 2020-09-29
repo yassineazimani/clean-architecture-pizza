@@ -25,6 +25,7 @@ import com.clean.architecture.pizza.core.ports.CategoryRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
 import java.util.List;
@@ -35,6 +36,18 @@ public class CategoryRepositoryImpl extends AbstractRepository<Category>
         implements CategoryRepository {
 
     private final static Logger LOGGER = LogManager.getLogger(CategoryRepositoryImpl.class);
+
+    @Override
+    public boolean existsByName(String name) {
+        Query query = this.entityManager.createQuery("SELECT c FROM Category c WHERE c.name = :name", Category.class);
+        query.setParameter("name", name);
+        try {
+            Category cat = (Category) query.getSingleResult();
+            return cat != null;
+        }catch(NoResultException e){
+            return false;
+        }
+    }// existsByName()
 
     @Override
     public boolean existsById(int id) {

@@ -42,6 +42,13 @@ public interface ProductRepository extends ManagementTransaction{
 
     /**
      * Vérifie l'existence d'un produit
+     * @param name Nom du produit
+     * @return boolean
+     */
+    boolean existsByName(String name);
+
+    /**
+     * Vérifie l'existence d'un produit
      * @param id Identifiant du produit
      * @return boolean
      */

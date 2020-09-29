@@ -23,6 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PersistProduct {
@@ -96,6 +97,12 @@ public class PersistProduct {
             if(CollectionUtils.isNotEmpty(errors)){
                 ProductException pe = new ProductException("Mandatory fields are missing");
                 pe.setFieldsErrors(errors);
+                throw pe;
+            }
+            if(this.productRepository.existsByName(product.getName())){
+                final String error = "A product with the name " + product.getName() + " already exists";
+                ProductException pe = new ProductException(error);
+                pe.setFieldsErrors(Collections.singletonList(error));
                 throw pe;
             }
         }

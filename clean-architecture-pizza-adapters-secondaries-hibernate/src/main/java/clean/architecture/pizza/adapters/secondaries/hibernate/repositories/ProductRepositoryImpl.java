@@ -26,6 +26,7 @@ import com.clean.architecture.pizza.core.ports.ProductRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
 import java.util.List;
@@ -61,6 +62,19 @@ public class ProductRepositoryImpl extends AbstractRepository<Product>
     }// findById()
 
     @Override
+    public boolean existsByName(String name) {
+        Query query = this.entityManager.createQuery("SELECT p FROM Product p WHERE p.name = :name", Product.class);
+        query.setParameter("name", name);
+        try{
+            Product cat = (Product) query.getSingleResult();
+            return cat != null;
+        }
+        catch(NoResultException e){
+            return false;
+        }
+    }// existsByName()
+
+    @Override
     public boolean existsById(int id) {
         return this.findById(id).isPresent();
     }// existsById()
@@ -68,11 +82,9 @@ public class ProductRepositoryImpl extends AbstractRepository<Product>
     @Override
     public void deleteById(int id) throws DatabaseException {
         try {
-            this.entityManager.getTransaction().begin();
             Query query = this.entityManager.createQuery("DELETE FROM Product p WHERE p.id = :id");
             query.setParameter("id", Integer.valueOf(id));
             query.executeUpdate();
-            this.entityManager.getTransaction().commit();
         }catch(RollbackException re){
             LOGGER.error(re.getMessage(), re);
             throw new DatabaseException("Impossible to delete product with id " + id);
