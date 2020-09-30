@@ -18,7 +18,12 @@ package utils;
 public enum MappingEnum {
     ID("id"),
     NAME("name"),
-    PASSWORD("password");
+    PASSWORD("password"),
+    ORDER_STATE("orderState"),
+    TOTAL("total"),
+    TRANSACTION_CB_ID("transactionCbId"),
+    PRODUCTS_OF_ORDER("products"),
+    ORDER_DATE("orderDate");
 
     private String name;
 

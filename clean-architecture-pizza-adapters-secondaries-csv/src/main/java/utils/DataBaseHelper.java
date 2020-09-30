@@ -28,6 +28,8 @@ public class DataBaseHelper {
 
     public final static String SEPARATOR_CSV = ";";
 
+    public final static String SEPARATOR_PRODUCTS_ORDER = ":";
+
     public final static String DB_FILE = "db.csv";
 
     public static void createFile(String path){
@@ -103,7 +105,7 @@ public class DataBaseHelper {
             return Integer.valueOf(tmp[columns.get(MappingEnum.ID.getName())]);
         })
         .max(Integer::compare)
-        .get();
+        .orElse(0);
         return String.valueOf(maxId + 1);
     }// generateId()
 

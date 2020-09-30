@@ -15,35 +15,213 @@
  */
 package repositories;
 
+import com.clean.architecture.pizza.core.enums.OrderStateEnum;
 import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.exceptions.TransactionException;
 import com.clean.architecture.pizza.core.model.OrderDTO;
+import com.clean.architecture.pizza.core.model.ProductDTO;
 import com.clean.architecture.pizza.core.model.StatsSumOrderTotalByProductsDTO;
 import com.clean.architecture.pizza.core.ports.OrderRepository;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import utils.DataBaseHelper;
+import utils.MappingEnum;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class OrderRepositoryImpl implements OrderRepository {
 
+    private String pathOrderDbFile;
+
+    private ProductRepositoryImpl productRepository;
+
+    private SimpleDateFormat sdf;
+
+    private static final Logger LOGGER = LogManager.getLogger(OrderRepositoryImpl.class);
+
+    public OrderRepositoryImpl() {
+        try {
+            Properties properties = new DataBaseHelper().getProperties();
+            this.pathOrderDbFile = properties.getProperty("path.order.db");
+            this.productRepository = new ProductRepositoryImpl();
+            this.sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }// OrderRepositoryImpl()
+
     @Override
     public Optional<OrderDTO> findById(int id) {
-        return Optional.empty();
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new File(this.pathOrderDbFile));
+            final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
+            while (scanner.hasNext()) {
+                List<String> row = DataBaseHelper.parseRow(scanner);
+                String columnValue = row.get(columns.get(MappingEnum.ID.getName()));
+                if(columnValue != null && String.valueOf(id).equals(columnValue)){
+                    OrderDTO orderDTO = new OrderDTO();
+                    orderDTO.setId(id);
+                    try {
+                        orderDTO.setOrderDate(this.sdf.parse(row.get(columns.get(MappingEnum.ORDER_DATE.getName()))));
+                    }catch(ParseException pe){
+                        LOGGER.error(pe.getMessage(), pe);
+                    }
+                    orderDTO.setOrderState(OrderStateEnum.valueOf(row.get(columns.get(MappingEnum.ORDER_STATE.getName()))));
+                    orderDTO.setTotal(Double.valueOf(row.get(columns.get(MappingEnum.TOTAL.getName()))));
+                    orderDTO.setTransactionCBId(row.get(columns.get(MappingEnum.TRANSACTION_CB_ID.getName())));
+
+                    String productsFromOrder = row.get(columns.get(MappingEnum.PRODUCTS_OF_ORDER.getName()));
+                    List<String> productsIds = Arrays.asList(productsFromOrder.split(DataBaseHelper.SEPARATOR_PRODUCTS_ORDER));
+                    List<ProductDTO> products = productsIds.stream().map(productId -> this.productRepository
+                                .findById(Integer.valueOf(productId))
+                                .orElse(null)
+                    ).filter(Objects::nonNull)
+                     .collect(Collectors.toList());
+                    orderDTO.setProducts(products);
+
+                    return Optional.of(orderDTO);
+                }
+            }
+            return Optional.empty();
+        } catch (FileNotFoundException e) {
+            LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
+            return Optional.empty(); // Dans la pratique, on remonterait l'exception avec DataBaseException
+        } finally{
+            if(scanner != null){
+                scanner.close();
+            }
+        }
     }// findById()
 
     @Override
     public OrderDTO save(OrderDTO order) throws DatabaseException, ArgumentMissingException {
-        return null;
+        if(order == null){
+            throw new ArgumentMissingException("Order is null");
+        }
+        List<String> lines;
+        try {
+            File file = new File(this.pathOrderDbFile);
+            lines = FileUtils.readLines(file, StandardCharsets.UTF_8.name());
+            final Map<String, Integer> columns = DataBaseHelper.parseHead(lines.get(0));
+            final Map<Integer, String> idxToColumns = DataBaseHelper.inverseMappingHeader(columns);
+
+            StringBuilder sb = new StringBuilder();
+            List<Integer> indexes = new ArrayList<>(columns.values());
+            String idGenerated = DataBaseHelper.generateId(lines, columns);
+
+            indexes.stream()
+                    .sorted(Integer::compare)
+                    .forEach(idx -> {
+                        if(MappingEnum.ID.getName().equals(idxToColumns.get(idx))){
+                            sb.append(idGenerated);
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }else if(MappingEnum.ORDER_DATE.getName().equals(idxToColumns.get(idx))){
+                            sb.append(this.sdf.format(order.getOrderDate()));
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }else if(MappingEnum.ORDER_STATE.getName().equals(idxToColumns.get(idx))){
+                            sb.append(order.getOrderState().ordinal() + 1);
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }else if(MappingEnum.TOTAL.getName().equals(idxToColumns.get(idx))){
+                            sb.append(order.getTotal());
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }else if(MappingEnum.TRANSACTION_CB_ID.getName().equals(idxToColumns.get(idx))){
+                            sb.append(order.getTransactionCBId());
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }else if(MappingEnum.PRODUCTS_OF_ORDER.getName().equals(idxToColumns.get(idx))){
+                            List<String> productsIds = order.getProducts()
+                                    .stream()
+                                    .map(product -> product.getId().toString())
+                                    .collect(Collectors.toList());
+                            sb.append(String.join(DataBaseHelper.SEPARATOR_PRODUCTS_ORDER, productsIds));
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }
+                    });
+
+            String tmp = sb.toString();
+            String lineToAdd = tmp.substring(0, tmp.length()-1);
+
+            lines.add(lineToAdd);
+            FileUtils.writeLines(file, lines, false);
+            order.setId(Integer.valueOf(idGenerated));
+        } catch (IOException e) {
+            LOGGER.error("Error with File {}", DataBaseHelper.DB_FILE, e);
+            throw new DatabaseException("Impossible to save order");
+        }
+        return order;
     }// save()
 
     @Override
     public OrderDTO update(OrderDTO order) throws DatabaseException, ArgumentMissingException {
-        return null;
+        if(order == null){
+            throw new ArgumentMissingException("Order is null");
+        }
+        List<String> lines;
+        try {
+            File file = new File(this.pathOrderDbFile);
+            lines = FileUtils.readLines(file, StandardCharsets.UTF_8.name());
+            final Map<String, Integer> columns = DataBaseHelper.parseHead(lines.get(0));
+            final Map<Integer, String> idxToColumns = DataBaseHelper.inverseMappingHeader(columns);
+            List<String> updatedLines = lines.
+                    stream()
+                    .map(value -> {
+                        String[] rowSplitted = value.split(DataBaseHelper.SEPARATOR_CSV);
+                        if(rowSplitted[columns.get(MappingEnum.ID.getName())].equals(String.valueOf(order.getId()))){
+                            StringBuilder sb = new StringBuilder();
+                            List<Integer> indexes = new ArrayList<>(columns.values());
+                            indexes.stream()
+                                    .sorted(Integer::compare)
+                                    .forEach(idx -> {
+                                        if(MappingEnum.ID.getName().equals(idxToColumns.get(idx))){
+                                            sb.append(order.getId());
+                                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                                        }else if(MappingEnum.ORDER_DATE.getName().equals(idxToColumns.get(idx))){
+                                            sb.append(this.sdf.format(order.getOrderDate()));
+                                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                                        }else if(MappingEnum.ORDER_STATE.getName().equals(idxToColumns.get(idx))){
+                                            sb.append(order.getOrderState().ordinal() + 1);
+                                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                                        }else if(MappingEnum.TOTAL.getName().equals(idxToColumns.get(idx))){
+                                            sb.append(order.getTotal());
+                                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                                        }else if(MappingEnum.TRANSACTION_CB_ID.getName().equals(idxToColumns.get(idx))){
+                                            sb.append(order.getTransactionCBId());
+                                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                                        }else if(MappingEnum.PRODUCTS_OF_ORDER.getName().equals(idxToColumns.get(idx))){
+                                            List<String> productsIds = order.getProducts()
+                                                    .stream()
+                                                    .map(product -> product.getId().toString())
+                                                    .collect(Collectors.toList());
+                                            sb.append(String.join(DataBaseHelper.SEPARATOR_PRODUCTS_ORDER, productsIds));
+                                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                                        }
+                                    });
+                            String result = sb.toString();
+                            return result.substring(0, result.length()-1);
+                        }
+                        return value;
+                    })
+                    .collect(Collectors.toList());
+            FileUtils.writeLines(file, updatedLines, false);
+        } catch (IOException e) {
+            LOGGER.error("Error with File {}", DataBaseHelper.DB_FILE, e);
+            throw new DatabaseException("Impossible to update order");
+        }
+        return order;
     }// update()
 
     @Override
     public List<StatsSumOrderTotalByProductsDTO> getTotalSumByProducts() {
+        // modifier products pour y ajouter la quantité également pour pouvoir faire cette feature
         return null;
     }// getTotalSumByProducts()
 

@@ -155,8 +155,26 @@ public class CategoryRepositoryImpl implements CategoryRepository{
             File file = new File(this.pathCategoryDbFile);
             lines = FileUtils.readLines(file, StandardCharsets.UTF_8.name());
             final Map<String, Integer> columns = DataBaseHelper.parseHead(lines.get(0));
+            final Map<Integer, String> idxToColumns = DataBaseHelper.inverseMappingHeader(columns);
+
             String idGenerated = DataBaseHelper.generateId(lines, columns);
-            lines.add(idGenerated + DataBaseHelper.SEPARATOR_CSV + category.getName());
+            StringBuilder sb = new StringBuilder();
+            List<Integer> indexes = new ArrayList<>(columns.values());
+            indexes.stream()
+                    .sorted(Integer::compare)
+                    .forEach(idx -> {
+                        if(MappingEnum.ID.getName().equals(idxToColumns.get(idx))){
+                            sb.append(idGenerated);
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }else{
+                            sb.append(category.getName());
+                            sb.append(DataBaseHelper.SEPARATOR_CSV);
+                        }
+                    });
+            String tmp = sb.toString();
+            String lineToAdd = tmp.substring(0, tmp.length()-1);
+
+            lines.add(lineToAdd);
             FileUtils.writeLines(file, lines, false);
         } catch (IOException e) {
             LOGGER.error("Error with File {}", DataBaseHelper.DB_FILE, e);
