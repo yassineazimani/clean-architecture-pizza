@@ -18,15 +18,20 @@ package clean.architecture.pizza.adapters.secondaries.hibernate.repositories;
 import clean.architecture.pizza.adapters.secondaries.hibernate.config.AbstractRepository;
 import clean.architecture.pizza.adapters.secondaries.hibernate.entities.*;
 import clean.architecture.pizza.adapters.secondaries.hibernate.mappers.OrderMapper;
+import clean.architecture.pizza.adapters.secondaries.hibernate.mappers.ProductMapper;
+import clean.architecture.pizza.adapters.secondaries.hibernate.projections.ProductQuantityProjection;
 import com.clean.architecture.pizza.core.enums.OrderStateEnum;
 import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.model.OrderDTO;
+import com.clean.architecture.pizza.core.model.ProductDTO;
 import com.clean.architecture.pizza.core.model.StatsSumOrderTotalByProductsDTO;
 import com.clean.architecture.pizza.core.ports.OrderRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,8 +43,34 @@ public class OrderRepositoryImpl extends AbstractRepository<Order> implements Or
         if(order == null){
             return Optional.empty();
         }
-        this.entityManager.refresh(order);
+        try {
+            this.entityManager.refresh(order);
+        }catch(EntityNotFoundException e){
+            return Optional.empty();
+        }
+        List<ProductQuantityProjection> projections = this.entityManager.createQuery("SELECT new clean.architecture.pizza.adapters.secondaries.hibernate.projections.ProductQuantityProjection(ohp.id.productid, ohp.quantity) FROM OrderHasProducts ohp WHERE ohp.id.orderid = :orderid", ProductQuantityProjection.class)
+                .setParameter("orderid", id)
+                .getResultList();
+        List<Integer> productsIds = projections.stream().map(p -> p.getProductId()).collect(Collectors.toList());
+        List<ProductDTO> products = this.entityManager.createQuery("SELECT p FROM Product p WHERE p.id in :ids", Product.class)
+                .setParameter("ids", productsIds)
+                .getResultStream()
+                .map(product -> {
+                    ProductDTO productDTO = ProductMapper.INSTANCE.toDto(product);
+                    Optional<ProductQuantityProjection> opt = projections.stream()
+                            .filter(proj -> proj.getProductId() == product.getId())
+                            .findAny();
+                    if(opt.isPresent()){
+                        productDTO.setQuantityOrdered(opt.get().getQuantity());
+                        return productDTO;
+                    }else{
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         OrderDTO orderDTO = OrderMapper.INSTANCE.toDto(order);
+        orderDTO.setProducts(products);
         orderDTO.setOrderState(OrderStateEnum.valueOf(order.getOrderState().getId()));
         return Optional.of(orderDTO);
     }// findById()

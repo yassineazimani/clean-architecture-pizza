@@ -35,6 +35,13 @@ public class StatsOrders {
         this.authenticationUser = authenticationUser;
     }// StatsOrders
 
+    /**
+     * Récupère les sommes de toutes les commandes en fonction de chaque
+     * produit les composant. Attention : Cette fonction ne retourne
+     * pas les produits les plus vendus en fonction de leurs sommes !
+     * @return
+     * @throws AuthenticationException
+     */
     public List<StatsSumOrderTotalByProductsDTO> getSumTotalOrdersByProducts() throws AuthenticationException {
         if(!authenticationUser.isAuthenticated()){
             throw new AuthenticationException("You need to login");

@@ -16,6 +16,7 @@
 package com.clean.architecture.pizza.adapters.rest.config;
 
 import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.CategoryRepositoryImpl;
+import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.OrderRepositoryImpl;
 import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.ProductRepositoryImpl;
 import clean.architecture.pizza.adapters.secondaries.hibernate.repositories.UserRepositoryImpl;
 import com.clean.architecture.pizza.adapters.rest.services.AuthenticationUserImpl;
@@ -24,6 +25,9 @@ import com.clean.architecture.pizza.core.admin.auth.FetchUser;
 import com.clean.architecture.pizza.core.admin.category.FetchCategory;
 import com.clean.architecture.pizza.core.admin.category.PersistCategory;
 import com.clean.architecture.pizza.core.admin.category.RemoveCategory;
+import com.clean.architecture.pizza.core.admin.product.PersistProduct;
+import com.clean.architecture.pizza.core.admin.product.RemoveProduct;
+import com.clean.architecture.pizza.core.admin.stats.StatsOrders;
 import com.clean.architecture.pizza.core.fetch.FetchProducts;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -73,6 +77,21 @@ public class ConfigurationInjection {
     public RemoveCategory removeCategory(){
         return new RemoveCategory(new CategoryRepositoryImpl(), authenticationUserImpl());
     }// removeCategory()
+
+    @Bean
+    public PersistProduct persistProduct(){
+        return new PersistProduct(new ProductRepositoryImpl(), authenticationUserImpl());
+    }// persistProduct()
+
+    @Bean
+    public RemoveProduct removeProduct(){
+        return new RemoveProduct(new ProductRepositoryImpl(), authenticationUserImpl());
+    }// removeProduct()
+
+    @Bean
+    public StatsOrders statsOrders(){
+        return new StatsOrders(new OrderRepositoryImpl(), authenticationUserImpl());
+    }// statsorders()
 
 }// ConfigurationInjection
 

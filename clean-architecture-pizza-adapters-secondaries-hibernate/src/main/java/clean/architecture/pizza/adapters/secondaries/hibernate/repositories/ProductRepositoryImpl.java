@@ -26,6 +26,7 @@ import com.clean.architecture.pizza.core.ports.ProductRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
@@ -57,8 +58,12 @@ public class ProductRepositoryImpl extends AbstractRepository<Product>
         if(product == null){
             return Optional.empty();
         }
-        this.entityManager.refresh(product);
-        return Optional.of(ProductMapper.INSTANCE.toDto(product));
+        try {
+            this.entityManager.refresh(product);
+            return Optional.of(ProductMapper.INSTANCE.toDto(product));
+        }catch(EntityNotFoundException e){
+            return Optional.empty();
+        }
     }// findById()
 
     @Override

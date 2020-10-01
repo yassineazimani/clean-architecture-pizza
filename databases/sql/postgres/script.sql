@@ -23,9 +23,9 @@ CREATE TABLE state(
     CONSTRAINT PK_state PRIMARY KEY(id)
 );
 
-INSERT TABLE state (name) VALUES ('PENDING');
-INSERT TABLE state (name) VALUES ('SUCCESS');
-INSERT TABLE state (name) VALUES ('CANCELLED');
+INSERT INTO state (name) VALUES ('PENDING');
+INSERT INTO state (name) VALUES ('SUCCESS');
+INSERT INTO state (name) VALUES ('CANCELLED');
 
 CREATE TABLE ordercmd(
     id SERIAL NOT NULL,

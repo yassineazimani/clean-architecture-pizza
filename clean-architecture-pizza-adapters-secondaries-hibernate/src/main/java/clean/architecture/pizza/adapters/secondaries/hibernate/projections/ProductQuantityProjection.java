@@ -13,30 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utils;
+package clean.architecture.pizza.adapters.secondaries.hibernate.projections;
 
-public enum MappingEnum {
-    ID("id"),
-    NAME("name"),
-    PASSWORD("password"),
-    ORDER_STATE("orderState"),
-    TOTAL("total"),
-    TRANSACTION_CB_ID("transactionCbId"),
-    PRODUCTS_OF_ORDER("products"),
-    ORDER_DATE("orderDate"),
-    DESC("description"),
-    PRICE("price"),
-    QUANTITY_AVAILABLE("quantityavailable"),
-    CATEGORY_ID("categoryid");
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    private final String name;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductQuantityProjection {
 
-    MappingEnum(String name) {
-        this.name = name;
-    }// MappingEnum()
+    private int productId;
 
-    public String getName() {
-        return name;
-    }// getName()
+    private int quantity;
 
-}// MappingEnum
+}// ProductQuantityDTO

@@ -53,8 +53,9 @@ public class AdminStatsTask {
     }// run()
 
     /**
-     * Affichage de la somme totale pour chaque produit
-     * vendu (de manière globale)
+     * Affichage de la somme totale pour tous les produits composant une commande.
+     * Attention : Cette fonction ne retourne pas les sommes de chaque produit d'une commande.
+     * (de manière globale)
      */
     public void getSumOrderTotalByProducts(){
         List<StatsSumOrderTotalByProductsDTO> stats;

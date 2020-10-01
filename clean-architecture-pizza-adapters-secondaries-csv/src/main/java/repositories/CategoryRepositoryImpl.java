@@ -50,14 +50,12 @@ public class CategoryRepositoryImpl implements CategoryRepository{
 
     @Override
     public boolean existsByName(String name) {
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File(this.pathCategoryDbFile));
+        try (Scanner scanner = new Scanner(new File(this.pathCategoryDbFile))) {
             final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
             while (scanner.hasNext()) {
                 List<String> row = DataBaseHelper.parseRow(scanner);
                 String columnValue = row.get(columns.get(MappingEnum.NAME.getName()));
-                if(columnValue != null && name.equals(columnValue)){
+                if (name.equals(columnValue)) {
                     return true;
                 }
             }
@@ -65,23 +63,17 @@ public class CategoryRepositoryImpl implements CategoryRepository{
         } catch (FileNotFoundException e) {
             LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
             return false;  // Dans la pratique, on remonterait l'exception avec DataBaseException
-        } finally{
-            if(scanner != null){
-                scanner.close();
-            }
         }
     }// existsByName()
 
     @Override
     public boolean existsById(int id) {
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File(this.pathCategoryDbFile));
+        try (Scanner scanner = new Scanner(new File(this.pathCategoryDbFile))) {
             final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
             while (scanner.hasNext()) {
                 List<String> row = DataBaseHelper.parseRow(scanner);
                 String columnValue = row.get(columns.get(MappingEnum.ID.getName()));
-                if(columnValue != null && String.valueOf(id).equals(columnValue)){
+                if (String.valueOf(id).equals(columnValue)) {
                     return true;
                 }
             }
@@ -89,10 +81,6 @@ public class CategoryRepositoryImpl implements CategoryRepository{
         } catch (FileNotFoundException e) {
             LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
             return false;  // Dans la pratique, on remonterait l'exception avec DataBaseException
-        } finally{
-            if(scanner != null){
-                scanner.close();
-            }
         }
     }// existsById()
 
@@ -119,14 +107,12 @@ public class CategoryRepositoryImpl implements CategoryRepository{
 
     @Override
     public Optional<CategoryDTO> findById(int id) {
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File(this.pathCategoryDbFile));
+        try (Scanner scanner = new Scanner(new File(this.pathCategoryDbFile))) {
             final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
             while (scanner.hasNext()) {
                 List<String> row = DataBaseHelper.parseRow(scanner);
                 String columnValue = row.get(columns.get(MappingEnum.ID.getName()));
-                if(columnValue != null && String.valueOf(id).equals(columnValue)){
+                if (String.valueOf(id).equals(columnValue)) {
                     CategoryDTO categoryDTO = new CategoryDTO(
                             Integer.valueOf(row.get(columns.get(MappingEnum.ID.getName()))),
                             row.get(columns.get(MappingEnum.NAME.getName()))
@@ -138,10 +124,6 @@ public class CategoryRepositoryImpl implements CategoryRepository{
         } catch (FileNotFoundException e) {
             LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
             return Optional.empty(); // Dans la pratique, on remonterait l'exception avec DataBaseException
-        } finally{
-            if(scanner != null){
-                scanner.close();
-            }
         }
     }// findById()
 
@@ -165,11 +147,10 @@ public class CategoryRepositoryImpl implements CategoryRepository{
                     .forEach(idx -> {
                         if(MappingEnum.ID.getName().equals(idxToColumns.get(idx))){
                             sb.append(idGenerated);
-                            sb.append(DataBaseHelper.SEPARATOR_CSV);
                         }else{
                             sb.append(category.getName());
-                            sb.append(DataBaseHelper.SEPARATOR_CSV);
                         }
+                        sb.append(DataBaseHelper.SEPARATOR_CSV);
                     });
             String tmp = sb.toString();
             String lineToAdd = tmp.substring(0, tmp.length()-1);
@@ -205,11 +186,10 @@ public class CategoryRepositoryImpl implements CategoryRepository{
                                    .forEach(idx -> {
                                        if(MappingEnum.ID.getName().equals(idxToColumns.get(idx))){
                                            sb.append(category.getId());
-                                           sb.append(DataBaseHelper.SEPARATOR_CSV);
                                        }else{
                                            sb.append(category.getName());
-                                           sb.append(DataBaseHelper.SEPARATOR_CSV);
                                        }
+                                       sb.append(DataBaseHelper.SEPARATOR_CSV);
                                    });
                             String result = sb.toString();
                             return result.substring(0, result.length()-1);
@@ -227,9 +207,7 @@ public class CategoryRepositoryImpl implements CategoryRepository{
     @Override
     public List<CategoryDTO> findAll() {
         List<CategoryDTO> categories = new ArrayList<>();
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File(this.pathCategoryDbFile));
+        try (Scanner scanner = new Scanner(new File(this.pathCategoryDbFile))) {
             final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
             while (scanner.hasNext()) {
                 List<String> row = DataBaseHelper.parseRow(scanner);
@@ -241,10 +219,6 @@ public class CategoryRepositoryImpl implements CategoryRepository{
         } catch (FileNotFoundException e) {
             LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
             return categories; // Dans la pratique, on remonterait l'exception avec DataBaseException
-        } finally{
-            if(scanner != null){
-                scanner.close();
-            }
         }
     }// findAll()
 

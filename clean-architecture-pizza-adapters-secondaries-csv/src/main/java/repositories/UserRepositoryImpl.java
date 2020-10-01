@@ -45,14 +45,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<UserDTO> findById(int id) {
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File(this.pathUserDbFile));
+        try (Scanner scanner = new Scanner(new File(this.pathUserDbFile))) {
             final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
             while (scanner.hasNext()) {
                 List<String> row = DataBaseHelper.parseRow(scanner);
                 String columnValue = row.get(columns.get(MappingEnum.ID.getName()));
-                if(columnValue != null && String.valueOf(id).equals(columnValue)){
+                if (String.valueOf(id).equals(columnValue)) {
                     UserDTO userDTO = new UserDTO(
                             Integer.valueOf(row.get(columns.get(MappingEnum.ID.getName()))),
                             row.get(columns.get(MappingEnum.PASSWORD.getName()))
@@ -64,10 +62,6 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (FileNotFoundException e) {
             LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
             return Optional.empty(); // Dans la pratique, on remonterait l'exception avec DataBaseException
-        } finally{
-            if(scanner != null){
-                scanner.close();
-            }
         }
     }// findById()
 

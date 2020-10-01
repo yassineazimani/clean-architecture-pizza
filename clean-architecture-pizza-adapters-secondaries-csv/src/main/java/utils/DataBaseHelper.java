@@ -30,6 +30,8 @@ public class DataBaseHelper {
 
     public final static String SEPARATOR_PRODUCTS_ORDER = ":";
 
+    public final static String SEPARATOR_PRODUCTS_QUANTITY_ORDER = "-";
+
     public final static String DB_FILE = "db.csv";
 
     public static void createFile(String path){

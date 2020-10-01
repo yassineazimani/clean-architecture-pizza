@@ -21,6 +21,7 @@ import clean.architecture.pizza.adapters.secondaries.hibernate.mappers.UserMappe
 import com.clean.architecture.pizza.core.model.UserDTO;
 import com.clean.architecture.pizza.core.ports.UserRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 public class UserRepositoryImpl extends AbstractRepository<User> implements UserRepository {
@@ -31,8 +32,12 @@ public class UserRepositoryImpl extends AbstractRepository<User> implements User
         if(user == null){
             return Optional.empty();
         }
-        this.entityManager.refresh(user);
-        return Optional.of(UserMapper.INSTANCE.toDto(user));
+        try {
+            this.entityManager.refresh(user);
+            return Optional.of(UserMapper.INSTANCE.toDto(user));
+        }catch(EntityNotFoundException e){
+            return Optional.empty();
+        }
     }// findById()
 
 }// UserRepositoryImpl

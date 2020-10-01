@@ -1,0 +1,8 @@
+id;name;description;price;quantityavailable;categoryid
+1;Four-cheese pizza;Pizza with four cheeses;8.9;5;1
+2;Vegetarian pizza;Pizza with mushrooms,tomatoes,peppers,carrot,onion;7.9;7;1
+3;Fish pizza;Pizza with salmon;8.2;15;1
+4;Pepperoni pizza;Delicious Pepperoni pizza;8.2;1;1
+5;Orangina;Orange drink with gas;2.9;0;2
+6;Coca-cola;The famous Coca-cola;2.9;56;2
+7;Lemon pie;Lemon pie;4.9;29;3

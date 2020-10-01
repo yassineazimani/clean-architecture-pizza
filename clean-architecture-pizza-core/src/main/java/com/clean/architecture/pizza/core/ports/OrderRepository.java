@@ -16,6 +16,7 @@
 package com.clean.architecture.pizza.core.ports;
 
 import com.clean.architecture.pizza.core.exceptions.ArgumentMissingException;
+import com.clean.architecture.pizza.core.exceptions.AuthenticationException;
 import com.clean.architecture.pizza.core.exceptions.DatabaseException;
 import com.clean.architecture.pizza.core.model.OrderDTO;
 import com.clean.architecture.pizza.core.model.StatsSumOrderTotalByProductsDTO;
@@ -31,6 +32,13 @@ public interface OrderRepository extends ManagementTransaction{
 
     OrderDTO update(OrderDTO order) throws DatabaseException, ArgumentMissingException;
 
+    /**
+     * Récupère les sommes de toutes les commandes en fonction des
+     * produits les composant. Attention : Cette fonction ne retourne
+     * pas les produits les plus vendus en fonction de leurs sommes !
+     * @return
+     * @throws AuthenticationException
+     */
     List<StatsSumOrderTotalByProductsDTO> getTotalSumByProducts();
 
 }// OrderRepository

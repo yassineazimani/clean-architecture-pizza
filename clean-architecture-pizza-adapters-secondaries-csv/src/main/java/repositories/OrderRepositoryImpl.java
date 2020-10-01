@@ -24,6 +24,7 @@ import com.clean.architecture.pizza.core.model.ProductDTO;
 import com.clean.architecture.pizza.core.model.StatsSumOrderTotalByProductsDTO;
 import com.clean.architecture.pizza.core.ports.OrderRepository;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.DataBaseHelper;
@@ -61,32 +62,37 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Optional<OrderDTO> findById(int id) {
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File(this.pathOrderDbFile));
+        try (Scanner scanner = new Scanner(new File(this.pathOrderDbFile))) {
             final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
             while (scanner.hasNext()) {
                 List<String> row = DataBaseHelper.parseRow(scanner);
                 String columnValue = row.get(columns.get(MappingEnum.ID.getName()));
-                if(columnValue != null && String.valueOf(id).equals(columnValue)){
+                if (String.valueOf(id).equals(columnValue)) {
                     OrderDTO orderDTO = new OrderDTO();
                     orderDTO.setId(id);
                     try {
                         orderDTO.setOrderDate(this.sdf.parse(row.get(columns.get(MappingEnum.ORDER_DATE.getName()))));
-                    }catch(ParseException pe){
+                    } catch (ParseException pe) {
                         LOGGER.error(pe.getMessage(), pe);
                     }
-                    orderDTO.setOrderState(OrderStateEnum.valueOf(row.get(columns.get(MappingEnum.ORDER_STATE.getName()))));
-                    orderDTO.setTotal(Double.valueOf(row.get(columns.get(MappingEnum.TOTAL.getName()))));
-                    orderDTO.setTransactionCBId(row.get(columns.get(MappingEnum.TRANSACTION_CB_ID.getName())));
+                    orderDTO.setOrderState(OrderStateEnum.valueOf(Integer.parseInt(row.get(columns.get(MappingEnum.ORDER_STATE.getName())))));
+                    orderDTO.setTotal(Double.parseDouble(row.get(columns.get(MappingEnum.TOTAL.getName()))));
+                    String tx = row.get(columns.get(MappingEnum.TRANSACTION_CB_ID.getName()));
+                    orderDTO.setTransactionCBId("NULL".equalsIgnoreCase(tx) ? null : tx);
 
                     String productsFromOrder = row.get(columns.get(MappingEnum.PRODUCTS_OF_ORDER.getName()));
                     List<String> productsIds = Arrays.asList(productsFromOrder.split(DataBaseHelper.SEPARATOR_PRODUCTS_ORDER));
-                    List<ProductDTO> products = productsIds.stream().map(productId -> this.productRepository
-                                .findById(Integer.valueOf(productId))
-                                .orElse(null)
-                    ).filter(Objects::nonNull)
-                     .collect(Collectors.toList());
+                    List<ProductDTO> products = productsIds.stream()
+                            .map(coupleProduct -> {
+                                String[] tmp = coupleProduct.split(DataBaseHelper.SEPARATOR_PRODUCTS_QUANTITY_ORDER);
+                                if (StringUtils.isEmpty(tmp[0])) return null;
+                                 ProductDTO p = this.productRepository
+                                        .findById(Integer.parseInt(tmp[0]))
+                                        .orElse(null);
+                                p.setQuantityOrdered(StringUtils.isEmpty(tmp[1]) ? 0 : Integer.parseInt(tmp[1]));
+                                return p;
+                            }).filter(Objects::nonNull)
+                            .collect(Collectors.toList());
                     orderDTO.setProducts(products);
 
                     return Optional.of(orderDTO);
@@ -96,16 +102,12 @@ public class OrderRepositoryImpl implements OrderRepository {
         } catch (FileNotFoundException e) {
             LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
             return Optional.empty(); // Dans la pratique, on remonterait l'exception avec DataBaseException
-        } finally{
-            if(scanner != null){
-                scanner.close();
-            }
         }
     }// findById()
 
     @Override
     public OrderDTO save(OrderDTO order) throws DatabaseException, ArgumentMissingException {
-        if(order == null){
+        if (order == null) {
             throw new ArgumentMissingException("Order is null");
         }
         List<String> lines;
@@ -122,25 +124,25 @@ public class OrderRepositoryImpl implements OrderRepository {
             indexes.stream()
                     .sorted(Integer::compare)
                     .forEach(idx -> {
-                        if(MappingEnum.ID.getName().equals(idxToColumns.get(idx))){
+                        if (MappingEnum.ID.getName().equals(idxToColumns.get(idx))) {
                             sb.append(idGenerated);
                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                        }else if(MappingEnum.ORDER_DATE.getName().equals(idxToColumns.get(idx))){
+                        } else if (MappingEnum.ORDER_DATE.getName().equals(idxToColumns.get(idx))) {
                             sb.append(this.sdf.format(order.getOrderDate()));
                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                        }else if(MappingEnum.ORDER_STATE.getName().equals(idxToColumns.get(idx))){
+                        } else if (MappingEnum.ORDER_STATE.getName().equals(idxToColumns.get(idx))) {
                             sb.append(order.getOrderState().ordinal() + 1);
                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                        }else if(MappingEnum.TOTAL.getName().equals(idxToColumns.get(idx))){
+                        } else if (MappingEnum.TOTAL.getName().equals(idxToColumns.get(idx))) {
                             sb.append(order.getTotal());
                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                        }else if(MappingEnum.TRANSACTION_CB_ID.getName().equals(idxToColumns.get(idx))){
+                        } else if (MappingEnum.TRANSACTION_CB_ID.getName().equals(idxToColumns.get(idx))) {
                             sb.append(order.getTransactionCBId());
                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                        }else if(MappingEnum.PRODUCTS_OF_ORDER.getName().equals(idxToColumns.get(idx))){
+                        } else if (MappingEnum.PRODUCTS_OF_ORDER.getName().equals(idxToColumns.get(idx))) {
                             List<String> productsIds = order.getProducts()
                                     .stream()
-                                    .map(product -> product.getId().toString())
+                                    .map(product -> product.getId() + DataBaseHelper.SEPARATOR_PRODUCTS_QUANTITY_ORDER + product.getQuantityOrdered())
                                     .collect(Collectors.toList());
                             sb.append(String.join(DataBaseHelper.SEPARATOR_PRODUCTS_ORDER, productsIds));
                             sb.append(DataBaseHelper.SEPARATOR_CSV);
@@ -148,7 +150,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                     });
 
             String tmp = sb.toString();
-            String lineToAdd = tmp.substring(0, tmp.length()-1);
+            String lineToAdd = tmp.substring(0, tmp.length() - 1);
 
             lines.add(lineToAdd);
             FileUtils.writeLines(file, lines, false);
@@ -162,7 +164,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public OrderDTO update(OrderDTO order) throws DatabaseException, ArgumentMissingException {
-        if(order == null){
+        if (order == null) {
             throw new ArgumentMissingException("Order is null");
         }
         List<String> lines;
@@ -175,38 +177,38 @@ public class OrderRepositoryImpl implements OrderRepository {
                     stream()
                     .map(value -> {
                         String[] rowSplitted = value.split(DataBaseHelper.SEPARATOR_CSV);
-                        if(rowSplitted[columns.get(MappingEnum.ID.getName())].equals(String.valueOf(order.getId()))){
+                        if (rowSplitted[columns.get(MappingEnum.ID.getName())].equals(String.valueOf(order.getId()))) {
                             StringBuilder sb = new StringBuilder();
                             List<Integer> indexes = new ArrayList<>(columns.values());
                             indexes.stream()
                                     .sorted(Integer::compare)
                                     .forEach(idx -> {
-                                        if(MappingEnum.ID.getName().equals(idxToColumns.get(idx))){
+                                        if (MappingEnum.ID.getName().equals(idxToColumns.get(idx))) {
                                             sb.append(order.getId());
                                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                                        }else if(MappingEnum.ORDER_DATE.getName().equals(idxToColumns.get(idx))){
+                                        } else if (MappingEnum.ORDER_DATE.getName().equals(idxToColumns.get(idx))) {
                                             sb.append(this.sdf.format(order.getOrderDate()));
                                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                                        }else if(MappingEnum.ORDER_STATE.getName().equals(idxToColumns.get(idx))){
+                                        } else if (MappingEnum.ORDER_STATE.getName().equals(idxToColumns.get(idx))) {
                                             sb.append(order.getOrderState().ordinal() + 1);
                                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                                        }else if(MappingEnum.TOTAL.getName().equals(idxToColumns.get(idx))){
+                                        } else if (MappingEnum.TOTAL.getName().equals(idxToColumns.get(idx))) {
                                             sb.append(order.getTotal());
                                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                                        }else if(MappingEnum.TRANSACTION_CB_ID.getName().equals(idxToColumns.get(idx))){
+                                        } else if (MappingEnum.TRANSACTION_CB_ID.getName().equals(idxToColumns.get(idx))) {
                                             sb.append(order.getTransactionCBId());
                                             sb.append(DataBaseHelper.SEPARATOR_CSV);
-                                        }else if(MappingEnum.PRODUCTS_OF_ORDER.getName().equals(idxToColumns.get(idx))){
+                                        } else if (MappingEnum.PRODUCTS_OF_ORDER.getName().equals(idxToColumns.get(idx))) {
                                             List<String> productsIds = order.getProducts()
                                                     .stream()
-                                                    .map(product -> product.getId().toString())
+                                                    .map(product -> product.getId() + DataBaseHelper.SEPARATOR_PRODUCTS_QUANTITY_ORDER + product.getQuantityOrdered())
                                                     .collect(Collectors.toList());
                                             sb.append(String.join(DataBaseHelper.SEPARATOR_PRODUCTS_ORDER, productsIds));
                                             sb.append(DataBaseHelper.SEPARATOR_CSV);
                                         }
                                     });
                             String result = sb.toString();
-                            return result.substring(0, result.length()-1);
+                            return result.substring(0, result.length() - 1);
                         }
                         return value;
                     })
@@ -221,15 +223,76 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<StatsSumOrderTotalByProductsDTO> getTotalSumByProducts() {
-        // modifier products pour y ajouter la quantité également pour pouvoir faire cette feature
-        return null;
+        List<OrderDTO> orders = this.findAll();
+        Map<String, Double> sums = new HashMap<>();
+        if (orders != null && !orders.isEmpty()){
+            for (OrderDTO order : orders) {
+                double total = order.getTotal();
+                for (ProductDTO product : order.getProducts()) {
+                    if (sums.containsKey(product.getName())) {
+                        sums.put(product.getName(), sums.get(product.getName()) + total);
+                    } else {
+                        sums.put(product.getName(), total);
+                    }
+                }
+            }
+        }
+        List<StatsSumOrderTotalByProductsDTO> stats = new ArrayList<>();
+        if(!sums.isEmpty()){
+            sums.forEach((productName, total) -> stats.add(new StatsSumOrderTotalByProductsDTO(total, productName)));
+        }
+        return stats;
     }// getTotalSumByProducts()
 
-    @Override
-    public void begin() {}
+    private List<OrderDTO> findAll() {
+        List<OrderDTO> results = new ArrayList<>();
+        try (Scanner scanner = new Scanner(new File(this.pathOrderDbFile))) {
+            final Map<String, Integer> columns = DataBaseHelper.parseHead(scanner);
+            while (scanner.hasNext()) {
+                List<String> row = DataBaseHelper.parseRow(scanner);
+                OrderDTO orderDTO = new OrderDTO();
+                orderDTO.setId(Integer.valueOf(row.get(columns.get(MappingEnum.ID.getName()))));
+                try {
+                    orderDTO.setOrderDate(this.sdf.parse(row.get(columns.get(MappingEnum.ORDER_DATE.getName()))));
+                } catch (ParseException pe) {
+                    LOGGER.error(pe.getMessage(), pe);
+                }
+                orderDTO.setOrderState(OrderStateEnum.valueOf(Integer.parseInt(row.get(columns.get(MappingEnum.ORDER_STATE.getName())))));
+                orderDTO.setTotal(Double.parseDouble(row.get(columns.get(MappingEnum.TOTAL.getName()))));
+                orderDTO.setTransactionCBId(row.get(columns.get(MappingEnum.TRANSACTION_CB_ID.getName())));
+
+                String productsFromOrder = row.get(columns.get(MappingEnum.PRODUCTS_OF_ORDER.getName()));
+                List<String> productsIds = Arrays.asList(productsFromOrder.split(DataBaseHelper.SEPARATOR_PRODUCTS_ORDER));
+                List<ProductDTO> products = productsIds.stream()
+                        .map(coupleProduct -> {
+                            String[] tmp = coupleProduct.split(DataBaseHelper.SEPARATOR_PRODUCTS_QUANTITY_ORDER);
+                            if (StringUtils.isEmpty(tmp[0])) return null;
+                            ProductDTO p = this.productRepository
+                                    .findById(Integer.parseInt(tmp[0]))
+                                    .orElse(null);
+                            p.setQuantityOrdered(StringUtils.isEmpty(tmp[1]) ? 0 : Integer.parseInt(tmp[1]));
+                            return p;
+                        }).filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                orderDTO.setProducts(products);
+
+                results.add(orderDTO);
+
+            }
+            return results;
+        } catch (FileNotFoundException e) {
+            LOGGER.error("File {} doesn't exist", DataBaseHelper.DB_FILE, e);
+            return results; // Dans la pratique, on remonterait l'exception avec DataBaseException
+        }
+    }// findAll()
 
     @Override
-    public void commit() throws TransactionException {}
+    public void begin() {
+    }
+
+    @Override
+    public void commit() throws TransactionException {
+    }
 
     @Override
     public void rollback() {}

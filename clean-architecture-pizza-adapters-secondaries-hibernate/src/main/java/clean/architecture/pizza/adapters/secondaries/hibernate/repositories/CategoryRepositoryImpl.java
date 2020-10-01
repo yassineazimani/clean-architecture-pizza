@@ -25,9 +25,9 @@ import com.clean.architecture.pizza.core.ports.CategoryRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.persistence.RollbackException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,8 +66,11 @@ public class CategoryRepositoryImpl extends AbstractRepository<Category>
         Category cat = this.entityManager.find(Category.class, id);
         if(cat == null){
             return Optional.empty();
+        }try {
+            this.entityManager.refresh(cat);
+        } catch(EntityNotFoundException e){
+            return Optional.empty();
         }
-        this.entityManager.refresh(cat);
         return Optional.of(CategoryMapper.INSTANCE.toDto(cat));
     }// findById()
 

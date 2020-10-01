@@ -4,6 +4,13 @@
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
         http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
     <persistence-unit name="PizzasDB">
+        <class>clean.architecture.pizza.adapters.secondaries.hibernate.entities.Category</class>
+        <class>clean.architecture.pizza.adapters.secondaries.hibernate.entities.Order</class>
+        <class>clean.architecture.pizza.adapters.secondaries.hibernate.entities.OrderHasProducts</class>
+        <class>clean.architecture.pizza.adapters.secondaries.hibernate.entities.OrderHasProductsId</class>
+        <class>clean.architecture.pizza.adapters.secondaries.hibernate.entities.OrderState</class>
+        <class>clean.architecture.pizza.adapters.secondaries.hibernate.entities.Product</class>
+        <class>clean.architecture.pizza.adapters.secondaries.hibernate.entities.User</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/pizzadb" />
             <property name="javax.persistence.jdbc.user" value="" />
@@ -14,7 +21,7 @@
             <property name="hibernate.format_sql" value="false" />
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL82Dialect" />
             <property name="hibernate.c3p0.min_size" value="5" />
-            <property name="hibernate.c3p0.max_size" value="20" />
+            <property name="hibernate.c3p0.max_size" value="10" />
             <property name="hibernate.c3p0.acquire_increment" value="5" />
             <property name="hibernate.c3p0.timeout" value="1800" />
         </properties>
