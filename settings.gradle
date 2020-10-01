@@ -5,4 +5,5 @@ include 'clean-architecture-pizza-adapters-primaries-cli'
 include 'clean-architecture-pizza-adapters-primaires-rest-spring-boot'
 include 'clean-architecture-pizza-adapters-secondaries-money-equipment'
 include 'clean-architecture-pizza-adapters-secondaries-csv'
+include 'clean-architecture-pizza-adapters-primaries-fx-customer'
 

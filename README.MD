@@ -97,9 +97,13 @@ To run the swing application :
 
 #### FX
 
+You must have Java 14 JRE to run Java FX.
+
 To run the FX application :
 
 ```bash
+    cd clean-architecture-pizza-adapters-primaries-fx-customer/build/image/bin
+    fx-customer
 ```
 
 ### Description project

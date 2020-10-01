@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.beryx.jlink' version '2.12.0'
+}
+
+group 'com.clean.architecture.pizza'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = "14"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+jlink {
+    launcher {
+        name = 'fx-customer'
+    }
+}
+
+mainClassName = 'com.clean.architecture.pizza.adapters.primaries.fx.customer.Application'
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+}
