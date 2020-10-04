@@ -159,6 +159,8 @@ Hexagonal architecture used by this project :
 
 ![Example FX](images/screenshoot-start-panel.jpg)
 
+![Example FX](images/main-fx.png)
+
 #### With Console
 
 ![Example console](images/example-console.jpg)

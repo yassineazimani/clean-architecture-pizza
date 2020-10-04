@@ -16,11 +16,12 @@
 package com.clean.architecture.pizza.adapters.primaries.fx.customer;
 
 import com.clean.architecture.pizza.adapters.primaries.fx.customer.enums.PanelEnum;
-import com.clean.architecture.pizza.adapters.primaries.fx.customer.panels.StartPanel;
 import com.clean.architecture.pizza.adapters.primaries.fx.customer.scenes.SwitchScene;
 import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class Application extends javafx.application.Application {
@@ -31,23 +32,31 @@ public class Application extends javafx.application.Application {
 
     private void initSwitchScene(){
         this.scene = new Scene(new VBox());
-        this.switchScene = new SwitchScene(this.scene);
-        this.switchScene.addPanel(PanelEnum.START_PANEL, new StartPanel());
+        this.switchScene = SwitchScene.getInstance(this.scene);
         this.switchScene.enablePanel(PanelEnum.START_PANEL);
     }// initSwitchScene()
+
+    private void setWidthAndHeightFromScreen(Stage stage){
+        if(stage != null){
+            Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+            stage.setX(primaryScreenBounds.getMinX());
+            stage.setY(primaryScreenBounds.getMinY());
+            stage.setWidth(primaryScreenBounds.getWidth());
+            stage.setHeight(primaryScreenBounds.getHeight());
+        }
+    }// setWidthAndHeightFromScreen()
 
     @Override
     public void start(Stage stage) throws Exception {
         stage.setTitle("Customer part");
+        this.setWidthAndHeightFromScreen(stage);
         stage.setFullScreen(true);
-
         stage.setOnCloseRequest(e -> {
             Platform.exit();
             System.exit(0);
         });
 
         this.initSwitchScene();
-
         stage.setScene(scene);
         stage.show();
     }// start()

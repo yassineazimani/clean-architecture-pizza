@@ -25,5 +25,8 @@ jlink {
 mainClassName = 'com.clean.architecture.pizza.adapters.primaries.fx.customer.Application'
 
 dependencies {
+    compile project(':clean-architecture-pizza-core')
+    compile project(':clean-architecture-pizza-adapters-secondaries-csv')
+    compile project (':clean-architecture-pizza-adapters-secondaries-money-equipment')
     testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
 }

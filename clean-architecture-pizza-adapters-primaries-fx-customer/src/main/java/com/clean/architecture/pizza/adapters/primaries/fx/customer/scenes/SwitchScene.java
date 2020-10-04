@@ -16,6 +16,8 @@
 package com.clean.architecture.pizza.adapters.primaries.fx.customer.scenes;
 
 import com.clean.architecture.pizza.adapters.primaries.fx.customer.enums.PanelEnum;
+import com.clean.architecture.pizza.adapters.primaries.fx.customer.panels.StartPanel;
+import com.clean.architecture.pizza.adapters.primaries.fx.customer.panels.orders.ChoiceOrderPanel;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 
@@ -28,25 +30,26 @@ public class SwitchScene {
 
     private Scene mainScene;
 
-    public SwitchScene(Scene mainScene) {
+    private static SwitchScene instance;
+
+    private SwitchScene(){}// SwitchScene()
+
+    private SwitchScene(Scene mainScene) {
         this.mainScene = mainScene;
         this.panelsAvailable = new HashMap<>();
+        this.panelsAvailable.put(PanelEnum.START_PANEL, new StartPanel());
+        this.panelsAvailable.put(PanelEnum.CHOICE_ORDER_PANEL, new ChoiceOrderPanel());
     }// SwitchScene()
-
-    public void addPanel(PanelEnum pe, Pane panel){
-        if(pe != null && panel != null) {
-            this.panelsAvailable.put(pe, panel);
-        }
-    }// addPanel()
-
-    public void removePanel(PanelEnum pe){
-        if(pe != null && this.panelsAvailable.containsKey(pe)){
-            this.panelsAvailable.remove(pe);
-        }
-    }// removePanel()
 
     public void enablePanel(PanelEnum pe){
         this.mainScene.setRoot(this.panelsAvailable.get(pe));
     }// enablePanel()
+
+    public static SwitchScene getInstance(Scene mainScene){
+        if(instance == null){
+            instance = new SwitchScene(mainScene);
+        }
+        return instance;
+    }// getInstance()
 
 }// SwitchScene

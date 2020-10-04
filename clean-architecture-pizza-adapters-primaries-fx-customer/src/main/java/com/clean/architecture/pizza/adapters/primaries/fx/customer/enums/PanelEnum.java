@@ -16,5 +16,6 @@
 package com.clean.architecture.pizza.adapters.primaries.fx.customer.enums;
 
 public enum PanelEnum {
-    START_PANEL;
+    START_PANEL,
+    CHOICE_ORDER_PANEL;
 }// PanelEnum
